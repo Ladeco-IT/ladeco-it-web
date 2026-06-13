@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 
 export default function AboutPage() {
   return (
@@ -15,7 +15,7 @@ export default function AboutPage() {
           <p>
             We werken vanuit ons kantoor, maar komen ook graag bij je thuis om installaties te doen, problemen op te lossen of systemen te optimaliseren. Jouw IT, onze zorg.
           </p>
-          <p className="font-semibold text-slate-950">BTW-nummer: 1038.797.150</p>
+          
         </div>
       </div>
       <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-slate-700">

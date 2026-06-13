@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Footer from "./components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,12 +46,13 @@ export default function RootLayout({
               <Link className="rounded-full px-4 py-2 transition hover:bg-slate-100 hover:text-slate-950" href="/about">
                 Over ons
               </Link>
-              <Link className="rounded-full border border-slate-300 bg-slate-950 px-4 py-2 text-white transition hover:bg-slate-800" href="/contact">
+              <Link className="rounded-full px-4 py-2 transition hover:bg-slate-100 hover:text-slate-950" href="/contact">
                 Contact
               </Link>
             </nav>
           </header>
           <main className="flex-1">{children}</main>
+          <Footer />
         </div>
       </body>
     </html>

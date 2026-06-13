@@ -10,16 +10,6 @@ export default function ContactPage() {
           <p className="mt-4 max-w-xl text-base leading-8 text-slate-600">
             Heb je een vraag over onze diensten of wil je een afspraak maken? Vul het formulier in en we nemen snel contact met je op.
           </p>
-          <div className="mt-8 space-y-4 rounded-3xl bg-slate-50 p-6 text-slate-700">
-            <div>
-              <p className="text-sm font-semibold text-slate-950">E-mail</p>
-              <p>alessio@ladeco-it.com</p>
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-950">Locatie</p>
-              <p>Kantoorservice en huisbezoeken in de regio</p>
-            </div>
-          </div>
         </div>
         <ContactForm />
       </div>
