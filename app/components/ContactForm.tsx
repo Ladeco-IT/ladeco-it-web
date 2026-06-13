@@ -6,7 +6,7 @@ export default function ContactForm() {
       className="rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm"
     >
       <input type="hidden" name="_subject" value="Nieuw bericht van Ladeco IT website" />
-      <input type="hidden" name="_next" value="https://ladeco-it-web.vercel.app/" />
+      <input type="hidden" name="_next" value="https://ladeco-it.com/" />
       <input type="hidden" name="_captcha" value="false" />
       <div className="space-y-5">
         <div>

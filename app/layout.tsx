@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -17,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Ladeco IT | Computers, software en netwerkservice",
   description: "Ladeco IT verzorgt computerassemblage, softwareontwikkeling en netwerkondersteuning op kantoor en bij je thuis.",
+  icons: {
+    icon: "/logo.png",
+  }
 };
 
 export default function RootLayout({
@@ -33,7 +37,14 @@ export default function RootLayout({
         <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-6 sm:px-8 lg:px-12">
           <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm shadow-slate-200/50 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
-              <div className="h-11 w-11 rounded-2xl bg-slate-900"></div>
+              <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-white">
+                <Image
+                  src="/logo.png"
+                  alt="Ladeco IT logo"
+                  fill
+                  className="object-contain p-1"
+                />
+              </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Ladeco IT</p>
                 <p className="font-semibold text-slate-950">Computers, software & netwerkservice</p>
