@@ -1,9 +1,8 @@
-import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
+import Header from "./components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,35 +34,7 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-slate-50 text-slate-950">
         <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-6 sm:px-8 lg:px-12">
-          <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm shadow-slate-200/50 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-white">
-                <a href="/">
-                <Image
-                  src="/logo.png"
-                  alt="Ladeco IT logo"
-                  fill
-                  className="object-contain p-1"
-                />
-              </a>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Ladeco IT</p>
-                <p className="font-semibold text-slate-950">Computers, software & netwerkservice</p>
-              </div>
-            </div>
-            <nav className="flex flex-wrap items-center gap-3 text-sm text-slate-700">
-              <Link className="w-full rounded-full px-4 py-2 text-center transition hover:bg-slate-100 hover:text-slate-950 sm:w-auto" href="/">
-                Home
-              </Link>
-              <Link className="w-full rounded-full px-4 py-2 text-center transition hover:bg-slate-100 hover:text-slate-950 sm:w-auto" href="/about">
-                Over ons
-              </Link>
-              <Link className="w-full rounded-full px-4 py-2 text-center transition hover:bg-slate-100 hover:text-slate-950 sm:w-auto" href="/contact">
-                Contact
-              </Link>
-            </nav>
-          </header>
+          <Header />
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
