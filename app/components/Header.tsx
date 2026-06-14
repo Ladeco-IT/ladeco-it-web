@@ -64,7 +64,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               aria-current={isActive ? "page" : undefined}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${isActive ? "bg-slate-950 text-white shadow-sm shadow-slate-950/10" : "text-slate-700 hover:bg-slate-100 hover:text-slate-950"}`}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition sm:mx-1 ${isActive ? "bg-slate-950 text-white shadow-sm shadow-slate-950/10" : "text-slate-700 hover:bg-slate-100 hover:text-slate-950"}`}
               style={isActive ? { color: "#ffffff" } : undefined}
               onClick={() => setIsOpen(false)}
             >
