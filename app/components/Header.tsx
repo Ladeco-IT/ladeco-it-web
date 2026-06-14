@@ -20,8 +20,14 @@ export default function Header() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-white">
-            <Link href="/">
-              <Image src="/logo.png" alt="Ladeco IT logo" fill className="object-contain p-1" />
+            <Link href="/" className="relative block h-full w-full">
+              <Image
+                src="/logo.png"
+                alt="Ladeco IT logo"
+                fill
+                sizes="64px"
+                className="object-contain p-1"
+              />
             </Link>
           </div>
           <div>
