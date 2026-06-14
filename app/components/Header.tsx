@@ -7,18 +7,12 @@ import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  
   const pathname = usePathname();
-
-  
-
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "Over ons" },
     { href: "/contact", label: "Contact" },
   ];
-
-  
 
   return (
     <header className="mb-6 rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm shadow-slate-200/50 backdrop-blur-md dark:border-slate-700 dark:bg-slate-950/80 dark:shadow-slate-950/20">
@@ -32,7 +26,14 @@ export default function Header() {
                 alt="Ladeco IT logo"
                 fill
                 sizes="64px"
-                className="object-contain p-1"
+                className="object-contain p-1 block dark:hidden"
+              />
+              <Image
+                src="/logo-dark.png"
+                alt="Ladeco IT logo"
+                fill
+                sizes="64px"
+                className="object-contain p-1 hidden dark:block"
               />
             </Link>
           </div>

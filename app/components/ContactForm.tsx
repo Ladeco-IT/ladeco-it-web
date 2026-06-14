@@ -65,7 +65,7 @@ export default function ContactForm() {
         </div>
         <button
           type="submit"
-          className="inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
+          className="inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto cursor-pointer"
         >
           Verstuur bericht
         </button>
