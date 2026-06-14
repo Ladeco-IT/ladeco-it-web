@@ -1,6 +1,9 @@
 import ContactForm from "../components/ContactForm";
 
-export default function ContactPage() {
+export default async function ContactPage({ searchParams }: { searchParams?: Promise<{ success?: string }> }) {
+  const params = searchParams ? await searchParams : undefined;
+  const success = params?.success === "1";
+
   return (
     <main className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 dark:border-slate-700 dark:bg-slate-950 dark:shadow-slate-950/20">
       <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-start">
@@ -11,7 +14,7 @@ export default function ContactPage() {
             Heb je een vraag over onze diensten of wil je een afspraak maken? Vul het formulier in en we nemen snel contact met je op.
           </p>
         </div>
-        <ContactForm />
+        <ContactForm success={success} />
       </div>
     </main>
   );
