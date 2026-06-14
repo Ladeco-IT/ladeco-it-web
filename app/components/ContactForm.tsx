@@ -72,7 +72,7 @@ export default function ContactForm({ success }: { success?: boolean }) {
           type="submit"
           className="inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto cursor-pointer"
         >
-          Verstuur bericht
+          {isLoading ? 'Verzenden...' : 'Verstuur bericht'}
         </button>
       </div>
     </form>
