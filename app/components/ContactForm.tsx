@@ -8,6 +8,8 @@ export default function ContactForm() {
       <input type="hidden" name="_subject" value="Nieuw bericht van Ladeco IT website" />
       <input type="hidden" name="_next" value="https://ladeco-it.com/" />
       <input type="hidden" name="_captcha" value="true" />
+      <input type="hidden" name="_autoresponse"
+       value="Bedankt voor je bericht! We nemen snel contact op."></input>
       <div className="space-y-5">
         <div>
           <label htmlFor="name" className="block text-sm font-semibold text-slate-800 dark:text-slate-100">
