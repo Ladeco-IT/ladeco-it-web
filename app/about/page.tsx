@@ -2,7 +2,7 @@
 
 export default function AboutPage() {
   return (
-    <main className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <main className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
       <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Over ons</p>

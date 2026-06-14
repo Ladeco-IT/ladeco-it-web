@@ -2,7 +2,7 @@
 
 export default function Home() {
   return (
-    <main className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <main className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-center">
         <div className="space-y-6">
           <p className="inline-flex rounded-full bg-slate-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600">
@@ -29,10 +29,10 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <a href="/contact" className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:border-slate-400">
+            <a href="/contact" className="inline-flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-950 transition hover:border-slate-400 sm:w-auto">
               Vraag een offerte aan
             </a>
-            <a href="/about" className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:border-slate-400">
+            <a href="/about" className="inline-flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-950 transition hover:border-slate-400 sm:w-auto">
               Meer over ons
             </a>
           </div>

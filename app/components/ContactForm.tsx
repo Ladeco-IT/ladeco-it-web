@@ -1,13 +1,13 @@
 export default function ContactForm() {
   return (
     <form
-      action="https://formsubmit.co/alessio@ladeco-it.com"
+      action="https://formsubmit.co/26bc4c4785863ed150af05fde3932d95"
       method="POST"
       className="rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm"
     >
       <input type="hidden" name="_subject" value="Nieuw bericht van Ladeco IT website" />
       <input type="hidden" name="_next" value="https://ladeco-it.com/" />
-      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_captcha" value="true" />
       <div className="space-y-5">
         <div>
           <label htmlFor="name" className="block text-sm font-semibold text-slate-800">

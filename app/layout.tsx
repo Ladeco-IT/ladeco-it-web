@@ -38,12 +38,14 @@ export default function RootLayout({
           <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm shadow-slate-200/50 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-white">
+                <a href="/">
                 <Image
                   src="/logo.png"
                   alt="Ladeco IT logo"
                   fill
                   className="object-contain p-1"
                 />
+              </a>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Ladeco IT</p>
@@ -51,13 +53,13 @@ export default function RootLayout({
               </div>
             </div>
             <nav className="flex flex-wrap items-center gap-3 text-sm text-slate-700">
-              <Link className="rounded-full px-4 py-2 transition hover:bg-slate-100 hover:text-slate-950" href="/">
+              <Link className="w-full rounded-full px-4 py-2 text-center transition hover:bg-slate-100 hover:text-slate-950 sm:w-auto" href="/">
                 Home
               </Link>
-              <Link className="rounded-full px-4 py-2 transition hover:bg-slate-100 hover:text-slate-950" href="/about">
+              <Link className="w-full rounded-full px-4 py-2 text-center transition hover:bg-slate-100 hover:text-slate-950 sm:w-auto" href="/about">
                 Over ons
               </Link>
-              <Link className="rounded-full px-4 py-2 transition hover:bg-slate-100 hover:text-slate-950" href="/contact">
+              <Link className="w-full rounded-full px-4 py-2 text-center transition hover:bg-slate-100 hover:text-slate-950 sm:w-auto" href="/contact">
                 Contact
               </Link>
             </nav>
