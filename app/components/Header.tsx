@@ -3,9 +3,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "Over ons" },
+    { href: "/contact", label: "Contact" },
+  ];
 
   return (
     <header className="mb-6 rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm shadow-slate-200/50 backdrop-blur-md sm:flex sm:items-center sm:justify-between sm:gap-4">
@@ -49,27 +57,21 @@ export default function Header() {
         id="mobile-navigation"
         className={`mt-4 flex flex-col gap-3 text-sm text-slate-700 sm:mt-0 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 ${isOpen ? "block" : "hidden"} sm:block`}
       >
-        <Link
-          href="/"
-          className="rounded-full px-4 py-2 transition hover:bg-slate-100 hover:text-slate-950"
-          onClick={() => setIsOpen(false)}
-        >
-          Home
-        </Link>
-        <Link
-          href="/about"
-          className="rounded-full px-4 py-2 transition hover:bg-slate-100 hover:text-slate-950"
-          onClick={() => setIsOpen(false)}
-        >
-          Over ons
-        </Link>
-        <Link
-          href="/contact"
-          className="rounded-full px-4 py-2 transition hover:bg-slate-100 hover:text-slate-950"
-          onClick={() => setIsOpen(false)}
-        >
-          Contact
-        </Link>
+        {navLinks.map((link) => {
+          const isActive = pathname === link.href;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={isActive ? "page" : undefined}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${isActive ? "bg-slate-950 text-white shadow-sm shadow-slate-950/10" : "text-slate-700 hover:bg-slate-100 hover:text-slate-950"}`}
+              style={isActive ? { color: "#ffffff" } : undefined}
+              onClick={() => setIsOpen(false)}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </nav>
     </header>
   );
