@@ -12,7 +12,7 @@ export default function ContactForm({ success }: { success?: boolean }) {
         </div>
       )}
       <input type="hidden" name="_subject" value="Nieuw bericht van Ladeco IT website" />
-      <input type="hidden" name="_captcha" value="true" />
+      <input type="hidden" name="_captcha" value="false" />
       <input type="hidden" name="_next" value="/contact?success=1" />
       <input type="hidden" name="_autoresponse" value="Bedankt voor je bericht! We nemen snel contact op." />
       <div className="space-y-5">
