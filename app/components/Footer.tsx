@@ -1,12 +1,12 @@
 export default function Footer() {
   return (
-    <footer className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300">
-      <div className="mx-auto flex flex-col gap-3 max-w-7xl px-2 sm:flex-row sm:items-center sm:justify-between">
+    <footer className="mt-5 rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)]/90 p-5 text-[color:var(--muted)] sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-slate-950 dark:text-slate-100">Ladeco IT</p>
-          <p className="text-xs text-slate-600 dark:text-slate-500">BTW-nummer: 1038.797.150</p>
+          <p className="text-sm font-semibold text-[color:var(--foreground)]">Ladeco IT</p>
+          <p className="text-xs">BTW-nummer: 1038.797.150</p>
         </div>
-        <div className="text-sm text-slate-600 dark:text-slate-500">
+        <div className="text-sm">
           <p>© {new Date().getFullYear()} Ladeco IT.</p>
           <p>Alle rechten voorbehouden.</p>
         </div>

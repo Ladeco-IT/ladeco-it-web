@@ -1,34 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --surface: #ffffff;
-  --surface-soft: #f8fafc;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --selection: #0f172a;
+  --background: #f6eee4;
+  --foreground: #241913;
+  --surface: #fcf8f2;
+  --surface-strong: #efe0ce;
+  --muted: #6f5b4e;
+  --border: #d7c1a8;
+  --accent: #9a5b2f;
+  --accent-soft: #f4e3d0;
+  --selection: #241913;
 }
 
 .dark {
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --surface: #111827;
-  --surface-soft: #1e293b;
-  --muted: #94a3b8;
-  --border: #334155;
-  --selection: #f8fafc;
+  --background: #191210;
+  --foreground: #f7efe8;
+  --surface: #241913;
+  --surface-strong: #34241b;
+  --muted: #bca593;
+  --border: #594536;
+  --accent: #d1a27d;
+  --accent-soft: #2f211a;
+  --selection: #f7efe8;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
-    --surface: #111827;
-    --surface-soft: #1e293b;
-    --muted: #94a3b8;
-    --border: #334155;
-    --selection: #f8fafc;
+    --background: #191210;
+    --foreground: #f7efe8;
+    --surface: #241913;
+    --surface-strong: #34241b;
+    --muted: #bca593;
+    --border: #594536;
+    --accent: #d1a27d;
+    --accent-soft: #2f211a;
+    --selection: #f7efe8;
   }
 }
 
@@ -39,12 +45,30 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--background);
+  background:
+    radial-gradient(circle at top left, rgba(154, 91, 47, 0.16), transparent 34%),
+    linear-gradient(135deg, #fbf3e8 0%, var(--background) 100%);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: "Inter", "Segoe UI", Arial, Helvetica, sans-serif;
+  line-height: 1.65;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(36, 25, 19, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(36, 25, 19, 0.035) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent 90%);
+  opacity: 0.4;
 }
 
 * {
@@ -65,4 +89,88 @@ textarea {
 ::selection {
   background: var(--selection);
   color: #ffffff;
+}
+
+.site-shell {
+  border: 1px solid rgba(215, 193, 168, 0.7);
+  background: rgba(252, 248, 242, 0.9);
+  box-shadow: 0 20px 60px rgba(36, 25, 19, 0.08);
+  border-radius: 2rem;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgba(36, 25, 19, 0.05);
+  border-radius: 1.5rem;
+}
+
+.panel-soft {
+  border: 1px solid rgba(215, 193, 168, 0.65);
+  background: linear-gradient(145deg, rgba(255, 248, 240, 0.95), var(--accent-soft));
+  border-radius: 1.5rem;
+}
+
+.eyebrow {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.eyebrow-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.eyebrow-accent::before {
+  content: "";
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 9999px;
+  background: var(--accent);
+  opacity: 0.8;
+}
+
+.headline {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+
+.story-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 0.7rem 1rem;
+  background: var(--surface);
+  color: var(--foreground);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.story-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(36, 25, 19, 0.08);
+  border-color: var(--accent);
+}
+
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(215, 193, 168, 0.75);
+  background: rgba(255, 248, 240, 0.75);
+  padding: 0.35rem 0.7rem;
+  color: var(--muted);
+  font-size: 0.82rem;
 }
