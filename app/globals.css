@@ -12,31 +12,6 @@
   --selection: #241913;
 }
 
-.dark {
-  --background: #191210;
-  --foreground: #f7efe8;
-  --surface: #241913;
-  --surface-strong: #34241b;
-  --muted: #bca593;
-  --border: #594536;
-  --accent: #d1a27d;
-  --accent-soft: #2f211a;
-  --selection: #f7efe8;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #191210;
-    --foreground: #f7efe8;
-    --surface: #241913;
-    --surface-strong: #34241b;
-    --muted: #bca593;
-    --border: #594536;
-    --accent: #d1a27d;
-    --accent-soft: #2f211a;
-    --selection: #f7efe8;
-  }
-}
 
 @theme inline {
   --color-background: var(--background);

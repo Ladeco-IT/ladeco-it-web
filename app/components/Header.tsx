@@ -24,14 +24,14 @@ export default function Header() {
               alt="Ladeco IT logo"
               fill
               sizes="56px"
-              className="block object-contain opacity-90 dark:hidden"
+              className="block object-contain opacity-90"
             />
             <Image
               src="/logo-dark.png"
               alt="Ladeco IT logo"
               fill
               sizes="56px"
-              className="hidden object-contain opacity-90 dark:block"
+              className="hidden object-contain opacity-90"
             />
           </div>
           <div className="min-w-0">

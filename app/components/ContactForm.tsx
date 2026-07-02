@@ -1,20 +1,65 @@
-export default function ContactForm({ success }: { success?: boolean }) {
+'use client';
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useState } from "react";
+
+export default function ContactForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const success = searchParams.get("success") === "1";
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setStatus("idle");
+    setMessage("");
+
+    const formData = new FormData(event.currentTarget);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.error || "Er ging iets mis bij het versturen van je bericht.");
+      }
+
+      event.currentTarget.reset();
+      router.replace("/contact?success=1", { scroll: false });
+      setStatus("success");
+      setMessage("Bedankt voor je bericht! We nemen snel contact met je op.");
+    } catch (error) {
+      setStatus("error");
+      setMessage(error instanceof Error ? error.message : "Er ging iets mis bij het versturen van je bericht.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
-    <form
-      action="https://formsubmit.co/26bc4c4785863ed150af05fde3932d95"
-      method="POST"
-      className="panel-soft p-6 sm:p-7"
-    >
-      {success && (
+    <form onSubmit={handleSubmit} className="panel-soft p-6 sm:p-7">
+      {(success || status === "success") && (
         <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900">
           <p className="text-sm font-semibold">Bedankt voor je bericht!</p>
           <p className="mt-1 text-sm">We nemen snel contact met je op.</p>
         </div>
       )}
-      <input type="hidden" name="_subject" value="Nieuw bericht van Ladeco IT website" />
-      <input type="hidden" name="_captcha" value="false" />
-      <input type="hidden" name="_next" value="/contact?success=1" />
-      <input type="hidden" name="_autoresponse" value="Bedankt voor je bericht! We nemen snel contact op." />
+
+      {status === "error" && (
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-900">
+          <p className="text-sm font-semibold">Versturen mislukt</p>
+          <p className="mt-1 text-sm">{message}</p>
+        </div>
+      )}
+
       <div className="space-y-5">
         <div>
           <label htmlFor="name" className="block text-sm font-semibold text-[color:var(--foreground)]">
@@ -70,9 +115,10 @@ export default function ContactForm({ success }: { success?: boolean }) {
         </div>
         <button
           type="submit"
-          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[color:var(--foreground)] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 sm:w-auto"
+          disabled={isSubmitting}
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[color:var(--foreground)] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
         >
-          Verstuur bericht
+          {isSubmitting ? "Versturen..." : "Verstuur bericht"}
         </button>
       </div>
     </form>
