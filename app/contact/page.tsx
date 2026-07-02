@@ -1,6 +1,9 @@
 import ContactForm from "../components/ContactForm";
 
-export default function ContactPage() {
+export default async function ContactPage({ searchParams }: { searchParams?: Promise<{ success?: string }> }) {
+  const params = searchParams ? await searchParams : undefined;
+  const success = params?.success === "1";
+
   return (
     <main className="space-y-16">
       <section className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
