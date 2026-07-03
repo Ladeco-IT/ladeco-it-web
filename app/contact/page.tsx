@@ -1,8 +1,7 @@
 import ContactForm from "../components/ContactForm";
 
-export default async function ContactPage({ searchParams }: { searchParams?: Promise<{ success?: string }> }) {
-  const params = searchParams ? await searchParams : undefined;
-  const success = params?.success === "1";
+export default async function ContactPage() {
+
 
   return (
     <main className="space-y-16">
