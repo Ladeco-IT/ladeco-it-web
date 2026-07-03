@@ -28,13 +28,13 @@
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4.3.2",
     "typescript": "^5",
-    "wrangler": "^4.106.0"
+    "wrangler": "^4.107.0"
   },
   "allowScripts": {
     "sharp@0.34.5": true,
     "unrs-resolver@1.12.2": true,
     "esbuild@0.25.4": true,
     "esbuild@0.28.1": true,
-    "workerd@1.20260630.1": true
+    "workerd@1.20260701.1": true
   }
 }
