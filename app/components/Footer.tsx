@@ -8,7 +8,6 @@ export default function Footer() {
         </div>
         <div className="space-y-1 text-right">
           <p>BTW-nummer: 1038.797.150</p>
-          <p>BTW-nummer: 1038.797.150</p>
           <p>© {new Date().getFullYear()} Ladeco IT. Alle rechten voorbehouden.</p>
         </div>
       </div>

@@ -18,7 +18,8 @@ export default function ContactForm() {
     setStatus("idle");
     setMessage("");
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
     try {
       const response = await fetch("/api/contact", {
@@ -32,7 +33,7 @@ export default function ContactForm() {
         throw new Error(result.error || "Er ging iets mis bij het versturen van je bericht.");
       }
 
-      event.currentTarget.reset();
+      form.reset();
       router.replace("/contact?success=1", { scroll: false });
       setStatus("success");
       setMessage("Bedankt voor je bericht! We nemen snel contact met je op.");
