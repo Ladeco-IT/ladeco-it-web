@@ -1,4 +1,17 @@
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ladeco-it.com";
+const rawSiteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://ladeco-it.com").trim();
+
+export const siteUrl = (() => {
+  const withProtocol = /^https?:\/\//i.test(rawSiteUrl) ? rawSiteUrl : `https://${rawSiteUrl}`;
+
+  try {
+    // Drop the trailing slash so `${siteUrl}/path` doesn’t create `//path`.
+    return new URL(withProtocol).toString().replace(/\/$/, "");
+  } catch {
+    throw new Error(
+      `Invalid NEXT_PUBLIC_SITE_URL: "${rawSiteUrl}". Expected an absolute URL like "https://example.com".`,
+    );
+  }
+})();
 
 export const siteName = "Ladeco IT";
 
