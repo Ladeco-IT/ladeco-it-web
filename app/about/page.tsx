@@ -1,38 +1,137 @@
+import type { Metadata } from "next";
 
+import { defaultKeywords, siteName, socialImage } from "../seo";
+
+export const metadata: Metadata = {
+  title: "Over ons",
+  description:
+    "Leer hoe Ladeco IT werkt: eerlijk advies, praktische uitvoering en service die verder helpt.",
+  alternates: {
+    canonical: "/about",
+  },
+  keywords: [...defaultKeywords, "over Ladeco IT", "IT bedrijf", "lokale IT service"],
+  openGraph: {
+    title: `Over ons | ${siteName}`,
+    description:
+      "Leer hoe Ladeco IT werkt: eerlijk advies, praktische uitvoering en service die verder helpt.",
+    url: "/about",
+    images: [
+      {
+        url: socialImage,
+        width: 1200,
+        height: 630,
+        alt: siteName,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Over ons | ${siteName}`,
+    description:
+      "Leer hoe Ladeco IT werkt: eerlijk advies, praktische uitvoering en service die verder helpt.",
+    images: [socialImage],
+  },
+};
 
 export default function AboutPage() {
   return (
-    <main className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 dark:border-slate-700 dark:bg-slate-950 dark:shadow-slate-950/20">
-      <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
-        <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Over ons</p>
-          <h1 className="mt-4 text-3xl font-semibold text-slate-950 sm:text-4xl dark:text-slate-100">Professioneel, lokaal en direct inzetbaar.</h1>
-        </div>
-        <div className="space-y-4 text-slate-600 dark:text-slate-300">
-          <p>
-            Ladeco IT helpt particulieren en kleine bedrijven met slimme IT-oplossingen. Van computerbouw en softwareontwikkeling tot netwerkbeheer en snelle support, wij hebben alles in huis om jouw werk soepel te laten verlopen.
-          </p>
-          <p>
-            We werken vanuit ons kantoor, maar komen ook graag bij je thuis om installaties te doen, problemen op te lossen of systemen te optimaliseren. Jouw IT, onze zorg.
+    <main className="space-y-16">
+      <section className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+        <div className="space-y-4">
+          <p className="eyebrow">Over ons</p>
+          <h1 className="headline text-4xl sm:text-5xl lg:text-6xl">
+            IT die eerlijk, helder en klantgericht werkt.
+          </h1>
+          <p className="max-w-3xl text-base leading-8 text-[color:var(--muted)] sm:text-lg">
+            Ladeco IT staat voor een goede prijs-kwaliteitverhouding, een service die je verder helpt en respect voor de klant in elke stap van het proces.
           </p>
         </div>
-      </div>
-      <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div>
-            <p className="text-sm font-semibold text-slate-950 dark:text-slate-100">Wat we doen</p>
-            <p className="mt-3 text-sm leading-7 dark:text-slate-300">
-              Computers samenstellen, software bouwen en netwerken beheren. Alles met een persoonlijke aanpak.
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-slate-950 dark:text-slate-100">Hoe we werken</p>
-            <p className="mt-3 text-sm leading-7 dark:text-slate-300">
-              We luisteren naar je wensen en leveren maatwerk dat op de lange termijn werkt, zowel thuis als op kantoor.
-            </p>
+
+        <div className="bg-[color:var(--surface)] border border-[color:var(--border)] p-6 text-[color:var(--muted)]">
+          <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">Onze kernwaarden</p>
+          <div className="mt-6 space-y-5">
+            <div>
+              <p className="font-semibold text-[color:var(--foreground)]">Prijs-kwaliteit</p>
+              <p className="mt-2 text-base leading-7">
+                Eerlijke oplossingen die passen bij jouw budget en die lang meegaan.
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold text-[color:var(--foreground)]">Goede service</p>
+              <p className="mt-2 text-base leading-7">
+                Snelle terugkoppeling en een daadkrachtige aanpak, ook nadat de opdracht klaar is.
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold text-[color:var(--foreground)]">Respect</p>
+              <p className="mt-2 text-base leading-7">
+                We luisteren naar jouw wensen, houden rekening met jouw omgeving en communiceren open.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="grid gap-8 lg:grid-cols-2 lg:items-start">
+        <div className="space-y-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">Wat je van ons krijgt</p>
+          <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">Geen verrassing, geen onnodige franje.</h2>
+          <p className="max-w-2xl text-base leading-8 text-[color:var(--muted)]">
+            We geven je een helder advies, een praktische uitvoering en een prijs die past bij wat je echt nodig hebt.
+          </p>
+        </div>
+
+        <div className="space-y-6 text-[color:var(--muted)]">
+          <div className="flex items-start gap-4">
+            <span className="mt-1 h-3 w-3 rounded-full bg-[color:var(--accent)]"></span>
+            <div>
+              <p className="font-semibold text-[color:var(--foreground)]">Duidelijke offertes</p>
+              <p className="mt-2 text-base leading-7">
+                Alles staat overzichtelijk op papier, zodat je direct weet waar je aan toe bent.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <span className="mt-1 h-3 w-3 rounded-full bg-[color:var(--accent)]"></span>
+            <div>
+              <p className="font-semibold text-[color:var(--foreground)]">Snelle service</p>
+              <p className="mt-2 text-base leading-7">
+                We reageren snel op vragen en lossen problemen op zonder lang te wachten.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <span className="mt-1 h-3 w-3 rounded-full bg-[color:var(--accent)]"></span>
+            <div>
+              <p className="font-semibold text-[color:var(--foreground)]">Betrouwbaarheid</p>
+              <p className="mt-2 text-base leading-7">
+                Onze planning is realistisch en we houden ons aan de afspraken die we maken.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-8">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="border-t border-[color:var(--border)]/40 pt-4 text-[color:var(--muted)]">
+            <p className="font-semibold text-[color:var(--foreground)]">Eerlijk</p>
+            <p className="mt-2 text-sm leading-6">Duidelijke prijzen en heldere afspraken.</p>
+          </div>
+          <div className="border-t border-[color:var(--border)]/40 pt-4 text-[color:var(--muted)]">
+            <p className="font-semibold text-[color:var(--foreground)]">Lokaal</p>
+            <p className="mt-2 text-sm leading-6">We kennen de regio en werken dichtbij onze klanten.</p>
+          </div>
+          <div className="border-t border-[color:var(--border)]/40 pt-4 text-[color:var(--muted)]">
+            <p className="font-semibold text-[color:var(--foreground)]">Praktisch</p>
+            <p className="mt-2 text-sm leading-6">Geen mooie woorden, maar direct toepasbare oplossingen.</p>
+          </div>
+          <div className="border-t border-[color:var(--border)]/40 pt-4 text-[color:var(--muted)]">
+            <p className="font-semibold text-[color:var(--foreground)]">Rust</p>
+            <p className="mt-2 text-sm leading-6">Zodat jij vertrouwen hebt in je IT.</p>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

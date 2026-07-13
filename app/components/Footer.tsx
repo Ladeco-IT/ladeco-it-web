@@ -1,14 +1,14 @@
 export default function Footer() {
   return (
-    <footer className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300">
-      <div className="mx-auto flex flex-col gap-3 max-w-7xl px-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-slate-950 dark:text-slate-100">Ladeco IT</p>
-          <p className="text-xs text-slate-600 dark:text-slate-500">BTW-nummer: 1038.797.150</p>
+    <footer className="mt-10 border-t border-[color:var(--border)]/60 pt-8 text-sm text-[color:var(--muted)]">
+      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--accent)]">Ladeco IT</p>
+          <p className="font-semibold text-[color:var(--foreground)]">Praktische IT, eerlijk en dichtbij.</p>
         </div>
-        <div className="text-sm text-slate-600 dark:text-slate-500">
-          <p>© {new Date().getFullYear()} Ladeco IT.</p>
-          <p>Alle rechten voorbehouden.</p>
+        <div className="space-y-1 text-right">
+          <p>BTW-nummer: 1038.797.150</p>
+          <p>© {new Date().getFullYear()} Ladeco IT. Alle rechten voorbehouden.</p>
         </div>
       </div>
     </footer>

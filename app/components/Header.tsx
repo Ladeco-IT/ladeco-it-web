@@ -15,58 +15,54 @@ export default function Header() {
   ];
 
   return (
-    <header className="mb-6 rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm shadow-slate-200/50 backdrop-blur-md dark:border-slate-700 dark:bg-slate-950/80 dark:shadow-slate-950/20">
-      <div className="flex items-center gap-4 sm:gap-6">
-        {/* Logo and Company Name */}
-        <div className="flex items-center gap-4">
-          <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-white dark:bg-slate-900">
-            <Link href="/" className="relative block h-full w-full">
-              <Image
-                src="/logo.png"
-                alt="Ladeco IT logo"
-                fill
-                sizes="64px"
-                className="object-contain p-1 block dark:hidden"
-              />
-              <Image
-                src="/logo-dark.png"
-                alt="Ladeco IT logo"
-                fill
-                sizes="64px"
-                className="object-contain p-1 hidden dark:block"
-              />
-            </Link>
+    <header className="w-full rounded-none border-0 bg-transparent px-0 py-0">
+      <div className="relative mx-auto flex max-w-6xl items-center px-4 py-3 sm:px-6">
+        <Link href="/" className="flex items-center gap-3">
+          <div className="relative h-12 w-12 overflow-hidden bg-transparent p-0 sm:h-14 sm:w-14">
+            <Image
+              src="/logo.png"
+              alt="Ladeco IT logo"
+              fill
+              sizes="56px"
+              className="block object-contain opacity-90"
+            />
+            <Image
+              src="/logo-dark.png"
+              alt="Ladeco IT logo"
+              fill
+              sizes="56px"
+              className="hidden object-contain opacity-90"
+            />
           </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Ladeco IT</p>
-            <p className="font-semibold text-slate-950 dark:text-slate-100">Computers, software & netwerkservice</p>
+          <div className="min-w-0">
+            <p className="text-[0.7rem] uppercase tracking-[0.3em] text-[color:var(--accent)]">Ladeco IT</p>
+            <p className="text-sm font-medium text-[color:var(--foreground)]">Computers, software & netwerkservice</p>
+          </div>
+        </Link>
+
+        <div className="absolute inset-x-0 flex justify-center sm:static sm:mx-auto">
+          <div className="hidden items-center gap-2 sm:flex">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors duration-200 ${isActive ? "bg-[color:var(--accent)] text-white shadow-sm shadow-[rgba(36,25,19,0.12)]" : "text-[color:var(--muted)] hover:bg-[color:var(--accent-soft)] hover:text-[color:var(--foreground)]"}`}
+                  style={isActive ? { color: "#ffffff" } : undefined}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
 
-        {/* Desktop Navigation + Theme Toggle - Hidden on mobile */}
-        <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-3 sm:ml-auto text-sm text-slate-700 dark:text-slate-300">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={isActive ? "page" : undefined}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition sm:mx-1 ${isActive ? "bg-slate-950 text-white shadow-sm shadow-slate-950/10" : "text-slate-700 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"}`}
-                style={isActive ? { color: "#ffffff" } : undefined}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-          
-        </div>
-
-        {/* Mobile Buttons - Right aligned */}
-        <div className="flex items-center gap-2 ml-auto sm:hidden">
+        <div className="ml-auto flex items-center gap-2 sm:hidden">
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-950 transition hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:bg-[color:var(--accent-soft)]"
             aria-expanded={isOpen}
             aria-controls="mobile-navigation"
             onClick={() => setIsOpen((current) => !current)}
@@ -88,10 +84,9 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       <nav
         id="mobile-navigation"
-        className={`mt-4 flex flex-col gap-3 text-sm text-slate-700 sm:hidden ${isOpen ? "block" : "hidden"} dark:text-slate-300`}
+        className={`mt-4 flex flex-col gap-2 text-sm sm:hidden ${isOpen ? "block" : "hidden"}`}
       >
         {navLinks.map((link) => {
           const isActive = pathname === link.href;
@@ -100,7 +95,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               aria-current={isActive ? "page" : undefined}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${isActive ? "bg-slate-950 text-white shadow-sm shadow-slate-950/10" : "text-slate-700 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"}`}
+              className={`rounded-full px-3.5 py-2 font-medium transition ${isActive ? "bg-[color:var(--accent)] text-white shadow-sm shadow-[rgba(36,25,19,0.12)]" : "text-[color:var(--muted)] hover:bg-[color:var(--accent-soft)] hover:text-[color:var(--foreground)]"}`}
               style={isActive ? { color: "#ffffff" } : undefined}
               onClick={() => setIsOpen(false)}
             >
