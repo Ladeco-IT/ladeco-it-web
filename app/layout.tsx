@@ -107,10 +107,12 @@ export default function RootLayout({
         ` }} />
       </head>
       <body className="min-h-full bg-slate-50 text-slate-950 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
-        <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-6 sm:px-8 lg:px-12">
+        <div className="flex min-h-screen flex-col">
           <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-6 pb-6 pt-0 sm:px-8 sm:pb-8 lg:px-12 lg:pb-10">
+            <main className="flex-1 pt-6 sm:pt-8 lg:pt-10">{children}</main>
+            <Footer />
+          </div>
         </div>
       </body>
     </html>
