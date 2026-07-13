@@ -9,8 +9,28 @@ export default function ContactForm() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const pcProfile = searchParams.get("pcProfile") || "";
+  const pcLabel = searchParams.get("pcLabel") || "";
+  const pcTotal = searchParams.get("pcTotal") || "";
+  const pcExtras = searchParams.get("pcExtras") || "";
+  const pcExtrasLabel = searchParams.get("pcExtrasLabel") || "";
   const success = searchParams.get("success") === "1";
+  const [subjectValue, setSubjectValue] = useState(() =>
+    pcLabel ? `Offerteaanvraag pc-configuratie: ${pcLabel}` : ""
+  );
+  const [messageValue, setMessageValue] = useState(() =>
+    pcLabel
+      ? `Hallo,
+
+Ik wil graag meer info en een offerte voor deze pc-configuratie:
+- Build: ${pcLabel}
+- Geschatte totaalprijs: € ${pcTotal || "onbekend"}
+- Extra hardware: ${pcExtrasLabel || "Geen extra hardware-upgrades"}
+
+Mijn vragen of voorkeuren:
+`
+      : ""
+  );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,6 +82,14 @@ export default function ContactForm() {
       )}
 
       <div className="space-y-5">
+        {pcLabel ? (
+          <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 text-sm leading-6 text-[color:var(--muted)]">
+            <p className="font-semibold text-[color:var(--foreground)]">Gekozen pc-configuratie</p>
+            <p className="mt-2">{pcLabel}</p>
+            <p className="mt-1">Geschatte totaalprijs: € {pcTotal || "onbekend"}</p>
+            <p className="mt-1">Extra hardware: {pcExtrasLabel || "Geen extra hardware-upgrades"}</p>
+          </div>
+        ) : null}
         <div>
           <label htmlFor="name" className="block text-sm font-semibold text-[color:var(--foreground)]">
             Naam
@@ -97,6 +125,8 @@ export default function ContactForm() {
             name="subject"
             type="text"
             required
+            value={subjectValue}
+            onChange={(event) => setSubjectValue(event.target.value)}
             className="mt-3 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none transition focus:border-[color:var(--accent)]"
             placeholder="Waar gaat je bericht over?"
           />
@@ -110,10 +140,17 @@ export default function ContactForm() {
             name="message"
             rows={6}
             required
+            value={messageValue}
+            onChange={(event) => setMessageValue(event.target.value)}
             className="mt-3 w-full rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none transition focus:border-[color:var(--accent)]"
             placeholder="Vertel ons wat je nodig hebt..."
           />
         </div>
+        <input type="hidden" name="pcProfile" value={pcProfile} />
+        <input type="hidden" name="pcLabel" value={pcLabel} />
+        <input type="hidden" name="pcTotal" value={pcTotal} />
+        <input type="hidden" name="pcExtras" value={pcExtras} />
+        <input type="hidden" name="pcExtrasLabel" value={pcExtrasLabel} />
         <button
           type="submit"
           disabled={isSubmitting}

@@ -9,6 +9,27 @@ export async function POST(request: NextRequest) {
   const email = String(formData.get("email") || "").trim();
   const subject = String(formData.get("subject") || "").trim();
   const message = String(formData.get("message") || "").trim();
+  const pcProfile = String(formData.get("pcProfile") || "").trim();
+  const pcLabel = String(formData.get("pcLabel") || "").trim();
+  const pcTotal = String(formData.get("pcTotal") || "").trim();
+  const pcExtras = String(formData.get("pcExtras") || "").trim();
+  const pcExtrasLabel = String(formData.get("pcExtrasLabel") || "").trim();
+
+  const pcSummaryHtml = pcLabel
+    ? `
+              <div style="margin-top: 24px; padding: 18px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; color: #7c2d12;">
+                <p style="margin: 0 0 12px; font-weight: 700; color: #9a3412;">Gekozen pc-configuratie</p>
+                <p style="margin: 0 0 8px;"><strong>Build:</strong> ${pcLabel}</p>
+                <p style="margin: 0 0 8px;"><strong>Totaal:</strong> € ${pcTotal || "onbekend"}</p>
+                <p style="margin: 0 0 8px;"><strong>Extra hardware:</strong> ${pcExtrasLabel || "Geen extra hardware-upgrades"}</p>
+                <p style="margin: 0;"><strong>Interne codes:</strong> profiel ${pcProfile || "n.v.t."}, extras ${pcExtras || "geen"}</p>
+              </div>
+      `
+    : "";
+
+  const pcSummaryText = pcLabel
+    ? `\n\nPc-configuratie:\n- Build: ${pcLabel}\n- Totaal: € ${pcTotal || "onbekend"}\n- Extra hardware: ${pcExtrasLabel || "Geen extra hardware-upgrades"}\n- Interne codes: profiel ${pcProfile || "n.v.t."}, extras ${pcExtras || "geen"}`
+    : "";
 
   if (!name || !email || !subject || !message) {
     return NextResponse.json({ error: "Vul alle velden in." }, { status: 400 });
@@ -52,6 +73,7 @@ export async function POST(request: NextRequest) {
                 <p style="margin: 0 0 12px; font-weight: 700; color: #111827;">Bericht</p>
                 <div style="white-space: pre-wrap;">${message.replace(/\n/g, "<br />")}</div>
               </div>
+              ${pcSummaryHtml}
             </div>
             <div style="padding: 16px 24px 24px; font-size: 12px; color: #6b7280; background: #f9fafb;">
               <p style="margin: 0;">Dit bericht is automatisch aangemaakt via het contactformulier van Ladeco IT.</p>
@@ -59,7 +81,7 @@ export async function POST(request: NextRequest) {
           </div>
         </div>
       `,
-      text: `Naam: ${name}\nE-mailadres: ${email}\nOnderwerp: ${subject}\n\nBericht:\n${message}`,
+      text: `Naam: ${name}\nE-mailadres: ${email}\nOnderwerp: ${subject}\n\nBericht:\n${message}${pcSummaryText}`,
     });
 
     if (error) {
