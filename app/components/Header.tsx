@@ -17,10 +17,10 @@ export default function Header() {
 
   return (
     <div className="w-full border-b border-[color:var(--border)]/70 bg-[color:var(--surface)]/95 shadow-[0_10px_30px_rgba(36,25,19,0.04)] backdrop-blur">
-      <div className="max-w-6xl mx-auto px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5">
+      <div className="px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5">
         <header className="w-full rounded-none border-0 bg-transparent px-0 py-0">
-          <div className="relative mx-auto flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
+          <div className="relative flex items-center sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
+            <Link href="/" className="flex items-center gap-3 sm:justify-self-start">
               <div className="relative h-12 w-12 overflow-hidden bg-transparent p-0 sm:h-14 sm:w-14">
                 <Image
                   src="/logo.png"
@@ -36,8 +36,8 @@ export default function Header() {
               </div>
             </Link>
 
-            <div className="absolute inset-x-0 flex justify-center sm:static sm:mx-auto">
-              <div className="hidden items-center gap-2 sm:flex">
+            <div className="hidden justify-self-center sm:flex sm:items-center sm:gap-2">
+              <div className="flex items-center gap-2">
                 {navLinks.map((link) => {
                   const isActive = pathname === link.href;
                   return (
@@ -54,6 +54,8 @@ export default function Header() {
                 })}
               </div>
             </div>
+
+            <div className="hidden sm:block sm:justify-self-end" aria-hidden="true" />
 
             <div className="ml-auto flex items-center gap-2 sm:hidden">
               <button
