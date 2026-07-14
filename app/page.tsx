@@ -61,6 +61,8 @@ export default function Home() {
               src="/logo.png"
               alt="Logo Ladeco IT"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="eager"
               className="object-contain"
             />
           </div>
@@ -74,6 +76,7 @@ export default function Home() {
               src="/computer_maken.png"
               alt="Computerassemblage in progress"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
           </div>
@@ -107,6 +110,7 @@ export default function Home() {
               src="/software_maken.png"
               alt="Softwareontwikkeling op een laptop"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
           </div>
@@ -120,6 +124,7 @@ export default function Home() {
               src="/basis_foto.png"
               alt="IT-werkplek met netwerkapparatuur"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
           </div>

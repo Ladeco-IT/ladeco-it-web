@@ -28,6 +28,7 @@ export default function Header() {
                   alt="Ladeco IT logo"
                   fill
                   sizes="56px"
+                  loading="eager"
                   className="object-contain opacity-90"
                 />
               </div>
