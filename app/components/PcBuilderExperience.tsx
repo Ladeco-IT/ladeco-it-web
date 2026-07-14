@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { usePcPricing } from "./usePcPricing";
+import { buildLocalizedHref, type Lang } from "../lib/i18n";
 
 const euro = new Intl.NumberFormat("nl-BE", {
   style: "currency",
@@ -11,8 +12,12 @@ const euro = new Intl.NumberFormat("nl-BE", {
   maximumFractionDigits: 2,
 });
 
-export default function PcBuilderExperience() {
-  const { pricingData, status, errorMessage, fallbackPricing } = usePcPricing();
+type PcBuilderExperienceProps = {
+  lang: Lang;
+};
+
+export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) {
+  const { pricingData: rawPricingData, status, errorMessage, fallbackPricing } = usePcPricing(lang);
   const [category, setCategory] = useState<"all" | "starter" | "gaming" | "creator">("all");
   const [resolution, setResolution] = useState<"all" | "1080p" | "1440p" | "mixed">("all");
   const [preferredRetailer, setPreferredRetailer] = useState<string>("all");
@@ -20,6 +25,100 @@ export default function PcBuilderExperience() {
   const [needsTwoTb, setNeedsTwoTb] = useState(false);
   const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState(fallbackPricing.profiles[0]?.id ?? "");
+
+  const pricingData = lang === "nl"
+    ? rawPricingData
+    : {
+        ...rawPricingData,
+        note: "Current market prices are fetched from multiple stores.",
+        options: rawPricingData.options.map((option) => {
+          if (option.id === "storage-2tb") {
+            return {
+              ...option,
+              label: "Upgrade to 2 TB NVMe SSD",
+              helper: "More room for large games, media libraries and project files.",
+            };
+          }
+
+          if (option.id === "memory-upgrade") {
+            return {
+              ...option,
+              label: "Memory upgrade to a higher-end configuration",
+              helper: "Useful for streaming, heavy multitasking or creative software.",
+            };
+          }
+
+          if (option.id === "cooling-upgrade") {
+            return {
+              ...option,
+              label: "Quieter cooling and better airflow",
+              helper: "For lower temperatures and less noise under load.",
+            };
+          }
+
+          return {
+            ...option,
+            label: "Better power supply with extra upgrade headroom",
+            helper: "Useful if you plan to install a stronger graphics card later.",
+          };
+        }),
+        profiles: rawPricingData.profiles.map((profile) => {
+          if (profile.id === "casual-5060") {
+            return {
+              ...profile,
+              name: "Entry gaming",
+              audience: "1080p gaming, school, everyday use",
+              description: "A full entry-level PC for popular games, schoolwork and a smooth daily workflow.",
+              includes: [
+                "Fully assembled desktop",
+                "RTX 5060-class graphics card",
+                "1 TB SSD storage",
+                "Suitable for 1080p gaming and general use",
+              ],
+              marketAnchors: profile.marketAnchors.map((anchor) => ({
+                ...anchor,
+                sourceNote: "Latest checked reference price",
+              })),
+            };
+          }
+
+          if (profile.id === "casual-5060ti") {
+            return {
+              ...profile,
+              name: "Strong all-round gaming",
+              audience: "1080p high, 1440p medium, streaming",
+              description: "More graphics headroom for heavier titles and a smoother multitasking experience.",
+              includes: [
+                "Fully assembled desktop",
+                "RTX 5060 Ti-class graphics card",
+                "More headroom for streaming and heavier games",
+                "A strong balance between price and performance",
+              ],
+              marketAnchors: profile.marketAnchors.map((anchor) => ({
+                ...anchor,
+                sourceNote: "Latest checked reference price",
+              })),
+            };
+          }
+
+          return {
+            ...profile,
+            name: "AM5 gaming starter",
+            audience: "1440p gaming, newer platform, easier upgrades later",
+            description: "For customers who want to start on a newer platform and grow more easily over time.",
+            includes: [
+              "Fully assembled desktop",
+              "AM5 platform for longer lifespan",
+              "1 TB SSD storage",
+              "Focused on upgrade-friendly gaming",
+            ],
+            marketAnchors: profile.marketAnchors.map((anchor) => ({
+              ...anchor,
+              sourceNote: "Latest checked reference price",
+            })),
+          };
+        }),
+      };
 
   const effectiveOptionIds = needsTwoTb && !selectedOptionIds.includes("storage-2tb")
     ? [...selectedOptionIds, "storage-2tb"]
@@ -56,8 +155,11 @@ export default function PcBuilderExperience() {
     filteredProfiles.find((profile) => profile.id === selectedProfileId) ?? filteredProfiles[0] ?? pricingData.profiles[0];
 
   const currentTotal = selectedProfile.basePrice + extrasTotal;
-  const selectedOptionLabels = selectedOptions.map((option) => option.label).join(", ") || "Geen extra hardware-upgrades";
-  const quoteLink = `/contact?pcProfile=${encodeURIComponent(selectedProfile.id)}&pcLabel=${encodeURIComponent(selectedProfile.name)}&pcTotal=${encodeURIComponent(currentTotal.toFixed(2))}&pcExtras=${encodeURIComponent(effectiveOptionIds.join(","))}&pcExtrasLabel=${encodeURIComponent(selectedOptionLabels)}`;
+  const selectedOptionLabels =
+    selectedOptions.map((option) => option.label).join(", ") ||
+    (lang === "nl" ? "Geen extra hardware-upgrades" : "No extra hardware upgrades");
+  const quoteSearch = `pcProfile=${encodeURIComponent(selectedProfile.id)}&pcLabel=${encodeURIComponent(selectedProfile.name)}&pcTotal=${encodeURIComponent(currentTotal.toFixed(2))}&pcExtras=${encodeURIComponent(effectiveOptionIds.join(","))}&pcExtrasLabel=${encodeURIComponent(selectedOptionLabels)}`;
+  const quoteLink = buildLocalizedHref("/contact", quoteSearch, lang);
 
   function toggleOption(optionId: string) {
     setSelectedOptionIds((current) =>
@@ -71,18 +173,28 @@ export default function PcBuilderExperience() {
     <main className="space-y-10">
       <section className="panel-soft space-y-6 p-6 sm:p-8 lg:p-10">
         <div className="max-w-3xl space-y-4">
-          <p className="eyebrow">Pc builder</p>
-          <h1 className="headline text-4xl sm:text-5xl lg:text-6xl">Stel een pc samen op basis van actuele winkelprijzen.</h1>
+          <p className="eyebrow">{lang === "nl" ? "Pc builder" : "PC builder"}</p>
+          <h1 className="headline text-4xl sm:text-5xl lg:text-6xl">
+            {lang === "nl" ? "Stel een pc samen op basis van actuele winkelprijzen." : "Build a PC based on current shop prices."}
+          </h1>
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
-            Deze pagina focust puur op de computer zelf. We vergelijken live prijzen uit meerdere winkels, filteren op jouw budget en tonen welke opbouw het meest logisch is voor jouw gebruik.
+            {lang === "nl"
+              ? "Deze pagina focust puur op de computer zelf. We vergelijken live prijzen uit meerdere winkels, filteren op jouw budget en tonen welke opbouw het meest logisch is voor jouw gebruik."
+              : "This page focuses purely on the computer itself. We compare live prices from several stores, filter by your budget and show which build makes the most sense for your use case."}
           </p>
         </div>
 
         <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-5 py-4 text-sm leading-7 text-[color:var(--muted)]">
           <p>{pricingData.note}</p>
-          <p className="mt-2">Vergelijkte winkels: {pricingData.retailers.join(", ")}</p>
-          <p className="mt-2">{pricingData.liveSourceCount} van de {pricingData.sourceCount} prijsbronnen zijn live opgehaald.</p>
-          {status === "loading" ? <p className="mt-2">Live prijzen worden opgehaald...</p> : null}
+          <p className="mt-2">
+            {lang === "nl" ? "Vergelijkte winkels" : "Compared stores"}: {pricingData.retailers.join(", ")}
+          </p>
+          <p className="mt-2">
+            {lang === "nl"
+              ? `${pricingData.liveSourceCount} van de ${pricingData.sourceCount} prijsbronnen zijn live opgehaald.`
+              : `${pricingData.liveSourceCount} of the ${pricingData.sourceCount} price sources were fetched live.`}
+          </p>
+          {status === "loading" ? <p className="mt-2">{lang === "nl" ? "Live prijzen worden opgehaald..." : "Fetching live prices..."}</p> : null}
           {status === "error" ? <p className="mt-2">{errorMessage}</p> : null}
         </div>
       </section>
@@ -90,20 +202,22 @@ export default function PcBuilderExperience() {
       <section className="grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
         <aside className="panel space-y-6 p-6">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">Filters</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">{lang === "nl" ? "Filters" : "Filters"}</p>
             <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
-              Pas de builder aan op basis van gebruik, resolutie, opslag en budget.
+              {lang === "nl"
+                ? "Pas de builder aan op basis van gebruik, resolutie, opslag en budget."
+                : "Adjust the builder based on use case, resolution, storage and budget."}
             </p>
           </div>
 
           <label className="block">
-            <span className="text-sm font-semibold text-[color:var(--foreground)]">Type gebruik</span>
+            <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Type gebruik" : "Usage type"}</span>
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value as typeof category)}
               className="mt-3 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none"
             >
-              <option value="all">Alles</option>
+              <option value="all">{lang === "nl" ? "Alles" : "All"}</option>
               <option value="starter">Starter</option>
               <option value="gaming">Gaming</option>
               <option value="creator">Creator</option>
@@ -111,27 +225,27 @@ export default function PcBuilderExperience() {
           </label>
 
           <label className="block">
-            <span className="text-sm font-semibold text-[color:var(--foreground)]">Doelresolutie</span>
+            <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Doelresolutie" : "Target resolution"}</span>
             <select
               value={resolution}
               onChange={(event) => setResolution(event.target.value as typeof resolution)}
               className="mt-3 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none"
             >
-              <option value="all">Alles</option>
+              <option value="all">{lang === "nl" ? "Alles" : "All"}</option>
               <option value="1080p">1080p</option>
               <option value="1440p">1440p</option>
-              <option value="mixed">Gemengd</option>
+              <option value="mixed">{lang === "nl" ? "Gemengd" : "Mixed"}</option>
             </select>
           </label>
 
           <label className="block">
-            <span className="text-sm font-semibold text-[color:var(--foreground)]">Goedkoopste winkel</span>
+            <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Goedkoopste winkel" : "Cheapest store"}</span>
             <select
               value={preferredRetailer}
               onChange={(event) => setPreferredRetailer(event.target.value)}
               className="mt-3 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none"
             >
-              <option value="all">Maakt niet uit</option>
+              <option value="all">{lang === "nl" ? "Maakt niet uit" : "Any"}</option>
               {pricingData.retailers.map((retailer) => (
                 <option key={retailer} value={retailer}>{retailer}</option>
               ))}
@@ -140,7 +254,7 @@ export default function PcBuilderExperience() {
 
           <div>
             <div className="flex items-center justify-between gap-4">
-              <span className="text-sm font-semibold text-[color:var(--foreground)]">Maximaal budget</span>
+              <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Maximaal budget" : "Maximum budget"}</span>
               <span className="text-sm font-semibold text-[color:var(--accent)]">{euro.format(budget)}</span>
             </div>
             <input
@@ -162,13 +276,13 @@ export default function PcBuilderExperience() {
               className="mt-1 h-4 w-4 accent-[color:var(--accent)]"
             />
             <span>
-              <span className="block text-sm font-semibold text-[color:var(--foreground)]">Minstens 2 TB opslag</span>
-              <span className="mt-1 block text-sm leading-6 text-[color:var(--muted)]">Voegt automatisch de opslagupgrade toe in de berekening.</span>
+              <span className="block text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Minstens 2 TB opslag" : "At least 2 TB storage"}</span>
+              <span className="mt-1 block text-sm leading-6 text-[color:var(--muted)]">{lang === "nl" ? "Voegt automatisch de opslagupgrade toe in de berekening." : "Automatically adds the storage upgrade to the calculation."}</span>
             </span>
           </label>
 
           <div>
-            <p className="text-sm font-semibold text-[color:var(--foreground)]">Extra hardware</p>
+            <p className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Extra hardware" : "Extra hardware"}</p>
             <div className="mt-3 space-y-3">
               {pricingData.options.filter((option) => option.id !== "storage-2tb").map((option) => {
                 const checked = selectedOptionIds.includes(option.id);
@@ -212,7 +326,9 @@ export default function PcBuilderExperience() {
                   <p className="text-sm font-semibold text-[color:var(--foreground)]">{profile.name}</p>
                   <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[color:var(--muted)]">{profile.audience}</p>
                   <p className="mt-4 text-2xl font-semibold text-[color:var(--foreground)]">{euro.format(total)}</p>
-                  <p className="mt-2 text-xs leading-5 text-[color:var(--accent)]">Goedkoopste bron: {profile.cheapestRetailer} ({euro.format(profile.cheapestTotal)})</p>
+                  <p className="mt-2 text-xs leading-5 text-[color:var(--accent)]">
+                    {lang === "nl" ? "Goedkoopste bron" : "Cheapest source"}: {profile.cheapestRetailer} ({euro.format(profile.cheapestTotal)})
+                  </p>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">{profile.description}</p>
                 </button>
               );
@@ -221,14 +337,14 @@ export default function PcBuilderExperience() {
 
           {filteredProfiles.length === 0 ? (
             <div className="panel p-6 text-sm leading-7 text-[color:var(--muted)]">
-              Geen configuraties gevonden binnen deze filters. Verhoog je budget of zet een filter breder.
+              {lang === "nl" ? "Geen configuraties gevonden binnen deze filters. Verhoog je budget of zet een filter breder." : "No configurations found within these filters. Increase your budget or broaden a filter."}
             </div>
           ) : null}
 
           {selectedProfile ? (
             <section className="panel-soft grid gap-6 p-6 lg:grid-cols-[0.92fr_1.08fr]">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">Gekozen build</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">{lang === "nl" ? "Gekozen build" : "Selected build"}</p>
                 <h2 className="mt-3 text-2xl font-semibold text-[color:var(--foreground)]">{selectedProfile.name}</h2>
                 <p className="mt-3 text-base leading-7 text-[color:var(--muted)]">{selectedProfile.description}</p>
                 <ul className="mt-5 space-y-2 text-sm leading-6 text-[color:var(--muted)]">
@@ -243,19 +359,21 @@ export default function PcBuilderExperience() {
 
               <div className="space-y-4 rounded-[1.4rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-5">
                 <div className="flex items-start justify-between gap-4">
-                  <span className="text-sm text-[color:var(--muted)]">Basisconfiguratie</span>
+                  <span className="text-sm text-[color:var(--muted)]">{lang === "nl" ? "Basisconfiguratie" : "Base configuration"}</span>
                   <span className="text-sm font-semibold text-[color:var(--foreground)]">{euro.format(selectedProfile.basePrice)}</span>
                 </div>
                 <div className="flex items-start justify-between gap-4">
-                  <span className="text-sm text-[color:var(--muted)]">Extra hardware</span>
+                  <span className="text-sm text-[color:var(--muted)]">{lang === "nl" ? "Extra hardware" : "Extra hardware"}</span>
                   <span className="text-sm font-semibold text-[color:var(--foreground)]">{euro.format(extrasTotal)}</span>
                 </div>
                 <div className="flex items-start justify-between gap-4 border-t border-[color:var(--border)] pt-4">
-                  <span className="text-sm font-semibold text-[color:var(--foreground)]">Totaal</span>
+                  <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Totaal" : "Total"}</span>
                   <span className="text-xl font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal)}</span>
                 </div>
                 <div className="rounded-2xl bg-[color:var(--accent-soft)]/70 px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
-                  Goedkoopste bron voor deze selectie nu: <span className="font-semibold text-[color:var(--foreground)]">{selectedProfile.cheapestRetailer}</span> rond <span className="font-semibold text-[color:var(--foreground)]">{euro.format(selectedProfile.cheapestTotal)}</span>.
+                  {lang === "nl"
+                    ? <>Goedkoopste bron voor deze selectie nu: <span className="font-semibold text-[color:var(--foreground)]">{selectedProfile.cheapestRetailer}</span> rond <span className="font-semibold text-[color:var(--foreground)]">{euro.format(selectedProfile.cheapestTotal)}</span>.</>
+                    : <>Cheapest source for this selection right now: <span className="font-semibold text-[color:var(--foreground)]">{selectedProfile.cheapestRetailer}</span> around <span className="font-semibold text-[color:var(--foreground)]">{euro.format(selectedProfile.cheapestTotal)}</span>.</>}
                 </div>
                 <div className="space-y-2">
                   {selectedProfile.marketAnchors.map((anchor) => (
@@ -272,10 +390,10 @@ export default function PcBuilderExperience() {
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Link href={quoteLink} className="story-link inline-flex justify-center">
-                    Vraag offerte voor deze build
+                    {lang === "nl" ? "Vraag offerte voor deze build" : "Request a quote for this build"}
                   </Link>
-                  <Link href="/contact" className="story-link inline-flex justify-center">
-                    Algemeen contact
+                  <Link href={buildLocalizedHref("/contact", lang === "nl" ? "" : "lang=en", lang)} className="story-link inline-flex justify-center">
+                    {lang === "nl" ? "Algemeen contact" : "General contact"}
                   </Link>
                 </div>
               </div>

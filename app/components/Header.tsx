@@ -3,25 +3,38 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { buildLocalizedHref, resolveLang, type Lang } from "../lib/i18n";
 
-export default function Header() {
+type HeaderProps = {
+  lang: Lang;
+  searchParams: string;
+};
+
+export default function Header({ lang, searchParams }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
   const pathname = usePathname();
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/pc-builder", label: "PC Builder" },
-    { href: "/pricing", label: "Prijzen"},
-    { href: "/about", label: "Over ons" },
-    { href: "/contact", label: "Contact" },
+    { href: "/", label: lang === "nl" ? "Home" : "Home" },
+    { href: "/pc-builder", label: lang === "nl" ? "PC Builder" : "PC Builder" },
+    { href: "/pricing", label: lang === "nl" ? "Prijzen" : "Pricing" },
+    { href: "/about", label: lang === "nl" ? "Over ons" : "About us" },
+    { href: "/contact", label: lang === "nl" ? "Contact" : "Contact" },
   ];
+
+  function handleLanguageChange(nextLang: string) {
+    const resolved = resolveLang(nextLang);
+    router.replace(buildLocalizedHref(pathname, searchParams, resolved));
+    setIsOpen(false);
+  }
 
   return (
     <div className="w-full border-b border-[color:var(--border)]/70 bg-[color:var(--surface)]/95 shadow-[0_10px_30px_rgba(36,25,19,0.04)] backdrop-blur">
       <div className="px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5">
         <header className="w-full rounded-none border-0 bg-transparent px-0 py-0">
-          <div className="relative flex items-center sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
-            <Link href="/" className="flex items-center gap-3 sm:justify-self-start">
+          <div className="relative flex items-center gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
+            <Link href={buildLocalizedHref("/", searchParams, lang)} className="flex items-center gap-3 sm:justify-self-start">
               <div className="relative h-12 w-12 overflow-hidden bg-transparent p-0 sm:h-14 sm:w-14">
                 <Image
                   src="/logo.png"
@@ -34,7 +47,9 @@ export default function Header() {
               </div>
               <div className="min-w-0">
                 <p className="text-[0.7rem] uppercase tracking-[0.3em] text-[color:var(--accent)]">Ladeco IT</p>
-                <p className="text-sm font-medium text-[color:var(--foreground)]">Computers, software & netwerkservice</p>
+                <p className="text-sm font-medium text-[color:var(--foreground)]">
+                  {lang === "nl" ? "Computers, software & netwerkservice" : "Computers, software & network services"}
+                </p>
               </div>
             </Link>
 
@@ -45,7 +60,7 @@ export default function Header() {
                   return (
                     <Link
                       key={link.href}
-                      href={link.href}
+                      href={buildLocalizedHref(link.href, searchParams, lang)}
                       aria-current={isActive ? "page" : undefined}
                       className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors duration-200 ${isActive ? "bg-[color:var(--accent)] text-white shadow-sm shadow-[rgba(36,25,19,0.12)]" : "text-[color:var(--muted)] hover:bg-[color:var(--accent-soft)] hover:text-[color:var(--foreground)]"}`}
                       style={isActive ? { color: "#ffffff" } : undefined}
@@ -57,7 +72,22 @@ export default function Header() {
               </div>
             </div>
 
-            <div className="hidden sm:block sm:justify-self-end" aria-hidden="true" />
+            <div className="hidden sm:flex sm:justify-self-end sm:items-center">
+              <label className="relative">
+                <span className="sr-only">{lang === "nl" ? "Selecteer taal" : "Select language"}</span>
+                <select
+                  value={lang}
+                  onChange={(event) => handleLanguageChange(event.target.value)}
+                  className="h-11 appearance-none rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 pr-10 text-sm font-semibold text-[color:var(--foreground)] outline-none transition hover:bg-[color:var(--accent-soft)]"
+                >
+                  <option value="nl">Nederlands</option>
+                  <option value="en">English</option>
+                </select>
+                <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[color:var(--muted)]">
+                  ▾
+                </span>
+              </label>
+            </div>
 
             <div className="ml-auto flex items-center gap-2 sm:hidden">
               <button
@@ -67,7 +97,7 @@ export default function Header() {
                 aria-controls="mobile-navigation"
                 onClick={() => setIsOpen((current) => !current)}
               >
-                <span className="sr-only">Menu {isOpen ? "sluiten" : " openen"}</span>
+                <span className="sr-only">{lang === "nl" ? `Menu ${isOpen ? "sluiten" : "openen"}` : `Menu ${isOpen ? "close" : "open"}`}</span>
                 {isOpen ? (
                   <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 6 6 18" />
@@ -88,12 +118,26 @@ export default function Header() {
             id="mobile-navigation"
             className={`mt-4 flex flex-col gap-2 text-sm sm:hidden ${isOpen ? "block" : "hidden"}`}
           >
+            <label className="relative mb-2 block">
+              <span className="sr-only">{lang === "nl" ? "Selecteer taal" : "Select language"}</span>
+              <select
+                value={lang}
+                onChange={(event) => handleLanguageChange(event.target.value)}
+                className="h-11 w-full appearance-none rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 pr-10 text-sm font-semibold text-[color:var(--foreground)] outline-none transition hover:bg-[color:var(--accent-soft)]"
+              >
+                <option value="nl">Nederlands</option>
+                <option value="en">English</option>
+              </select>
+              <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--muted)]">
+                ▾
+              </span>
+            </label>
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  href={buildLocalizedHref(link.href, searchParams, lang)}
                   aria-current={isActive ? "page" : undefined}
                   className={`rounded-full px-3.5 py-2 font-medium transition ${isActive ? "bg-[color:var(--accent)] text-white shadow-sm shadow-[rgba(36,25,19,0.12)]" : "text-[color:var(--muted)] hover:bg-[color:var(--accent-soft)] hover:text-[color:var(--foreground)]"}`}
                   style={isActive ? { color: "#ffffff" } : undefined}

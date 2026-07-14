@@ -6,10 +6,11 @@ import {
   PcPricingPayload,
   createFallbackPcPricingPayload,
 } from "@/app/lib/pcBuilderCatalog";
+import { type Lang } from "../lib/i18n";
 
 const fallbackPcPricing = createFallbackPcPricingPayload();
 
-export function usePcPricing() {
+export function usePcPricing(lang: Lang = "nl") {
   const [pricingData, setPricingData] = useState<PcPricingPayload>(fallbackPcPricing);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [errorMessage, setErrorMessage] = useState("");
@@ -22,7 +23,7 @@ export function usePcPricing() {
         const response = await fetch("/api/pc-builder-prices", { cache: "no-store" });
 
         if (!response.ok) {
-          throw new Error("De live prijsopvraging is momenteel niet beschikbaar.");
+          throw new Error(lang === "nl" ? "De live prijsopvraging is momenteel niet beschikbaar." : "The live price lookup is currently unavailable.");
         }
 
         const result = (await response.json()) as PcPricingPayload;
@@ -41,7 +42,7 @@ export function usePcPricing() {
 
         setPricingData(fallbackPcPricing);
         setStatus("error");
-        setErrorMessage(error instanceof Error ? error.message : "Live prijzen laden mislukt.");
+        setErrorMessage(error instanceof Error ? error.message : (lang === "nl" ? "Live prijzen laden mislukt." : "Failed to load live prices."));
       }
     }
 
