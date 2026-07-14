@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { defaultKeywords, siteDescription, siteName, socialImage } from "./seo";
 
 export const metadata: Metadata = {
-  title: "Computerassemblage, softwareontwikkeling en netwerkservice",
+  title: siteName,
   description: siteDescription,
   alternates: {
     canonical: "/",
