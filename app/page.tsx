@@ -1,8 +1,6 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import { defaultKeywords, siteDescription, siteName, socialImage } from "./seo";
-import PricingSimulator from "./components/PricingSimulator";
-import ServicePricing from "./components/ServicePricing";
 
 export const metadata: Metadata = {
   title: "Computerassemblage, softwareontwikkeling en netwerkservice",
