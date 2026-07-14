@@ -3,21 +3,6 @@ import type { Metadata } from "next";
 import { buildLocalizedHref, resolveLang } from "./lib/i18n";
 import { defaultKeywords, siteDescription, siteName, socialImage } from "./seo";
 
-const homeCopy = {
-  nl: {
-    title: siteName,
-    description: siteDescription,
-    openGraphTitle: siteName,
-    openGraphDescription: siteDescription,
-  },
-  en: {
-    title: siteName,
-    description: "Ladeco IT provides computer assembly, software development and network support at home and at your office.",
-    openGraphTitle: siteName,
-    openGraphDescription: "Ladeco IT provides computer assembly, software development and network support at home and at your office.",
-  },
-};
-
 export const metadata: Metadata = {
   title: siteName,
   description: siteDescription,
@@ -46,8 +31,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home({ searchParams }: { searchParams?: { lang?: string } }) {
-  const lang = resolveLang(searchParams?.lang);
+export default async function Home({ searchParams }: { searchParams?: Promise<{ lang?: string }> }) {
+  const resolvedSearchParams = await searchParams;
+  const lang = resolveLang(resolvedSearchParams?.lang);
   const copy = lang === "nl"
     ? {
         eyebrow: "IT-service op maat",
@@ -124,11 +110,11 @@ export default function Home({ searchParams }: { searchParams?: { lang?: string 
             {copy.intro}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <a href={buildLocalizedHref("/contact", searchParams?.lang ? `lang=${searchParams.lang}` : "", lang)} className="story-link justify-center sm:justify-start">
+            <a href={buildLocalizedHref("/contact", resolvedSearchParams?.lang ? `lang=${resolvedSearchParams.lang}` : "", lang)} className="story-link justify-center sm:justify-start">
               {copy.primary}
               <span aria-hidden="true">↗</span>
             </a>
-            <a href={buildLocalizedHref("/about", searchParams?.lang ? `lang=${searchParams.lang}` : "", lang)} className="story-link justify-center sm:justify-start">
+            <a href={buildLocalizedHref("/about", resolvedSearchParams?.lang ? `lang=${resolvedSearchParams.lang}` : "", lang)} className="story-link justify-center sm:justify-start">
               {copy.secondary}
             </a>
           </div>

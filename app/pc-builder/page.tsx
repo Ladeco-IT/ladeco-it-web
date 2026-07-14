@@ -43,8 +43,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PcBuilderPage({ searchParams }: { searchParams?: { lang?: string } }) {
-  const lang = resolveLang(searchParams?.lang);
+export default async function PcBuilderPage({ searchParams }: { searchParams?: Promise<{ lang?: string }> }) {
+  const resolvedSearchParams = await searchParams;
+  const lang = resolveLang(resolvedSearchParams?.lang);
 
   return <PcBuilderExperience lang={lang} />;
 }

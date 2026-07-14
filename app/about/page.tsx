@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { buildLocalizedHref, resolveLang } from "../lib/i18n";
+import { resolveLang } from "../lib/i18n";
 import { defaultKeywords, siteName, socialImage } from "../seo";
 
 const aboutCopy = {
@@ -42,8 +42,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AboutPage({ searchParams }: { searchParams?: { lang?: string } }) {
-  const lang = resolveLang(searchParams?.lang);
+export default async function AboutPage({ searchParams }: { searchParams?: Promise<{ lang?: string }> }) {
+  const resolvedSearchParams = await searchParams;
+  const lang = resolveLang(resolvedSearchParams?.lang);
   const copy = lang === "nl"
     ? {
         eyebrow: "Over ons",

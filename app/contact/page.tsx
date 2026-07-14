@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import ContactForm from "../components/ContactForm";
-import { buildLocalizedHref, resolveLang } from "../lib/i18n";
+import { resolveLang } from "../lib/i18n";
 import { defaultKeywords, siteName, socialImage } from "../seo";
 
 const contactCopy = {
@@ -43,8 +43,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ContactPage({ searchParams }: { searchParams?: { lang?: string } }) {
-  const lang = resolveLang(searchParams?.lang);
+export default async function ContactPage({ searchParams }: { searchParams?: Promise<{ lang?: string }> }) {
+  const resolvedSearchParams = await searchParams;
+  const lang = resolveLang(resolvedSearchParams?.lang);
   const copy = lang === "nl"
     ? {
         eyebrow: "Contact",

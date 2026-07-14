@@ -51,7 +51,7 @@ export function usePcPricing(lang: Lang = "nl") {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [lang]);
 
   return {
     pricingData,
