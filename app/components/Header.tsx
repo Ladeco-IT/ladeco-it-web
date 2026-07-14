@@ -11,6 +11,7 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/pc-builder", label: "PC Builder" },
+    { href: "/pricing", label: "Prijzen"},
     { href: "/about", label: "Over ons" },
     { href: "/contact", label: "Contact" },
   ];
