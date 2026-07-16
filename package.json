@@ -20,21 +20,21 @@
     "resend": "^6.17.2"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.2",
-    "@types/node": "^20",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.2.10",
-    "tailwindcss": "^4.3.2",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6",
-    "wrangler": "^4.110.0"
+    "wrangler": "^4.111.0"
   },
   "allowScripts": {
     "sharp@0.34.5": true,
     "unrs-resolver@1.12.2": true,
     "esbuild@0.25.4": true,
     "esbuild@0.28.1": true,
-    "workerd@1.20260708.1": true
+    "workerd@1.20260710.1": true
   }
 }

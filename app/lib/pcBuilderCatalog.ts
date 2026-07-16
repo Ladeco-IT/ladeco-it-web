@@ -81,33 +81,33 @@ const fallbackCheckedAt = "2026-07-13T12:00:00.000Z";
 export const serviceRates: ServiceRate[] = [
   {
     title: "Diagnose en foutanalyse",
-    price: 49,
+    price: 39,
     description: "Controle van pc, laptop of netwerkprobleem met duidelijk hersteladvies.",
   },
   {
     title: "Windows-installatie en basisconfiguratie",
-    price: 89,
+    price: 79,
     description: "Schone installatie, drivers, updates en basisbeveiliging.",
   },
   {
     title: "Data-overzet en back-uphulp",
-    price: 119,
+    price: 89,
     description: "Overzetten van documenten, foto's en basisinstellingen naar een nieuw toestel.",
   },
   {
     title: "Pc-assemblage en stresstest",
-    price: 149,
+    price: 119,
     description: "Montage, kabelmanagement, BIOS-update en stabiliteitstest.",
   },
   {
     title: "Netwerkinterventie op locatie",
-    price: 95,
+    price: 75,
     unit: "/ uur",
     description: "Voor wifi-problemen, routerinstallaties en kleine netwerkverbeteringen.",
   },
   {
     title: "Halfjaarlijks onderhoud",
-    price: 79,
+    price: 69,
     description: "Stofreiniging, updates, gezondheidscheck en prestatiecontrole.",
   },
 ];
