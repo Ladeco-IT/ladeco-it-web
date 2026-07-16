@@ -19,6 +19,9 @@ export default function ContactForm({ lang }: ContactFormProps) {
   const pcTotal = searchParams.get("pcTotal") || "";
   const pcExtras = searchParams.get("pcExtras") || "";
   const pcExtrasLabel = searchParams.get("pcExtrasLabel") || "";
+  const pcComponents = searchParams.get("pcComponents") || "";
+  const pcComponentsLabel = searchParams.get("pcComponentsLabel") || "";
+  const pcApproval = searchParams.get("pcApproval") || "";
   const success = searchParams.get("success") === "1";
   const [subjectValue, setSubjectValue] = useState(() =>
     pcLabel
@@ -59,6 +62,12 @@ My questions or preferences:
         selectedBuild: "Gekozen pc-configuratie",
         totalLabel: "Geschatte totaalprijs",
         extrasLabel: "Extra hardware",
+        componentsLabel: "Componentkeuze",
+        approvalLabel: "Akkoord op indicatie",
+        approvalYes: "Ja",
+        approvalNo: "Nee",
+        flowTitle: "Wat gebeurt er na je aanvraag?",
+        flowText: "We bekijken je configuratie intern, doen waar nodig prijs- of onderdeelaanpassingen en sturen je daarna een finale offerte.",
         name: "Naam",
         namePlaceholder: "Jouw naam",
         email: "E-mailadres",
@@ -77,6 +86,12 @@ My questions or preferences:
         selectedBuild: "Selected PC configuration",
         totalLabel: "Estimated total price",
         extrasLabel: "Extra hardware",
+        componentsLabel: "Component selection",
+        approvalLabel: "Approved estimate",
+        approvalYes: "Yes",
+        approvalNo: "No",
+        flowTitle: "What happens after your request?",
+        flowText: "We review your configuration internally, adjust pricing or components if needed, and then send you a final quote.",
         name: "Name",
         namePlaceholder: "Your name",
         email: "Email address",
@@ -145,6 +160,15 @@ My questions or preferences:
             <p className="mt-2">{pcLabel}</p>
             <p className="mt-1">{copy.totalLabel}: € {pcTotal || (lang === "nl" ? "onbekend" : "unknown")}</p>
             <p className="mt-1">{copy.extrasLabel}: {pcExtrasLabel || (lang === "nl" ? "Geen extra hardware-upgrades" : "No extra hardware upgrades")}</p>
+            <p className="mt-1">{copy.componentsLabel}: {pcComponentsLabel || (lang === "nl" ? "Niet opgegeven" : "Not provided")}</p>
+            <p className="mt-1">{copy.approvalLabel}: {pcApproval === "1" ? copy.approvalYes : copy.approvalNo}</p>
+          </div>
+        ) : null}
+
+        {pcLabel ? (
+          <div className="rounded-2xl bg-[color:var(--accent-soft)]/70 p-4 text-sm leading-6 text-[color:var(--muted)]">
+            <p className="font-semibold text-[color:var(--foreground)]">{copy.flowTitle}</p>
+            <p className="mt-1">{copy.flowText}</p>
           </div>
         ) : null}
         <div>
@@ -208,6 +232,9 @@ My questions or preferences:
         <input type="hidden" name="pcTotal" value={pcTotal} />
         <input type="hidden" name="pcExtras" value={pcExtras} />
         <input type="hidden" name="pcExtrasLabel" value={pcExtrasLabel} />
+        <input type="hidden" name="pcComponents" value={pcComponents} />
+        <input type="hidden" name="pcComponentsLabel" value={pcComponentsLabel} />
+        <input type="hidden" name="pcApproval" value={pcApproval} />
         <button
           type="submit"
           disabled={isSubmitting}

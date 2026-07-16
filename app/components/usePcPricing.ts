@@ -23,7 +23,7 @@ export function usePcPricing(lang: Lang = "nl") {
         const response = await fetch("/api/pc-builder-prices", { cache: "no-store" });
 
         if (!response.ok) {
-          throw new Error(lang === "nl" ? "De live prijsopvraging is momenteel niet beschikbaar." : "The live price lookup is currently unavailable.");
+          throw new Error(lang === "nl" ? "De prijsdata is momenteel niet beschikbaar." : "Price data is currently unavailable.");
         }
 
         const result = (await response.json()) as PcPricingPayload;
@@ -42,7 +42,7 @@ export function usePcPricing(lang: Lang = "nl") {
 
         setPricingData(fallbackPcPricing);
         setStatus("error");
-        setErrorMessage(error instanceof Error ? error.message : (lang === "nl" ? "Live prijzen laden mislukt." : "Failed to load live prices."));
+        setErrorMessage(error instanceof Error ? error.message : (lang === "nl" ? "Prijsdata laden is mislukt." : "Failed to load price data."));
       }
     }
 

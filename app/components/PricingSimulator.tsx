@@ -37,24 +37,19 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
       <div className="max-w-3xl space-y-4">
         <p className="eyebrow">{lang === "nl" ? "Pc building simulator" : "PC building simulator"}</p>
         <h2 className="headline text-3xl sm:text-4xl lg:text-5xl">
-          {lang === "nl" ? "Actuele computerprijzen, apart van onze servicekosten." : "Current computer prices, separate from our service fees."}
+          {lang === "nl" ? "Voordelige pc-configuraties, apart van onze servicekosten." : "Cost-efficient PC configurations, separate from our service fees."}
         </h2>
         <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
           {lang === "nl"
-            ? "Deze simulator gaat puur over de computer zelf. De basisprijzen komen uit een interne API die actuele retailerprijzen ophaalt, zodat je snel ziet welke pc-opbouw op dit moment het scherpst staat."
-            : "This simulator focuses purely on the computer itself. Base prices come from an internal API that fetches current retailer prices so you can quickly see which PC build is the sharpest right now."}
+            ? "Deze simulator gaat puur over de computer zelf. Je ziet direct hoe je prijs evolueert naargelang je configuratie en extra opties."
+            : "This simulator focuses purely on the computer itself. You immediately see how pricing changes based on your configuration and extras."}
         </p>
       </div>
 
       <div className="space-y-6">
         <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-5 py-4 text-sm leading-7 text-[color:var(--muted)]">
-          <p>{lang === "nl" ? pricingData.note : "Current market prices are fetched from multiple stores."}</p>
-          <p className="mt-2">
-            {lang === "nl"
-              ? `${pricingData.liveSourceCount} van de ${pricingData.sourceCount} prijsbronnen zijn live opgehaald.`
-              : `${pricingData.liveSourceCount} of the ${pricingData.sourceCount} price sources were fetched live.`}
-          </p>
-          {status === "loading" ? <p className="mt-2">{lang === "nl" ? "Live prijzen worden nu opgehaald..." : "Fetching live prices..."}</p> : null}
+          <p>{lang === "nl" ? pricingData.note : "Price data is continuously updated for accurate estimation."}</p>
+          {status === "loading" ? <p className="mt-2">{lang === "nl" ? "Prijsdata wordt bijgewerkt..." : "Updating price data..."}</p> : null}
           {status === "error" ? <p className="mt-2">{errorMessage}</p> : null}
         </div>
 
@@ -100,9 +95,6 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
                   </div>
 
                   <p className="mt-4 text-2xl font-semibold text-[color:var(--foreground)]">{euro.format(profileTotal)}</p>
-                  <p className="mt-2 text-xs leading-5 text-[color:var(--accent)]">
-                    {lang === "nl" ? "Goedkoopste bron nu" : "Cheapest source now"}: {profile.cheapestRetailer} ({euro.format(profile.cheapestTotal)})
-                  </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{profile.description}</p>
                 </button>
               );
@@ -159,24 +151,10 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
                   </ul>
                 </div>
 
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">{lang === "nl" ? "Marktankers" : "Market anchors"}</p>
-                  <div className="mt-3 space-y-2">
-                    {selectedProfile.marketAnchors.map((anchor) => (
-                      <div key={anchor.id} className="rounded-2xl bg-[color:var(--accent-soft)]/70 px-4 py-3">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <p className="text-sm font-semibold text-[color:var(--foreground)]">{anchor.label}</p>
-                            <p className="mt-1 text-xs leading-5 text-[color:var(--muted)]">{anchor.sourceNote}</p>
-                          </div>
-                          <p className="whitespace-nowrap text-sm font-semibold text-[color:var(--foreground)]">{euro.format(anchor.price)}</p>
-                        </div>
-                        <a href={anchor.url} className="mt-2 inline-flex text-xs font-semibold text-[color:var(--accent)]">
-                          {lang === "nl" ? "Bekijk bron bij" : "View source at"} {anchor.retailer}
-                        </a>
-                      </div>
-                    ))}
-                  </div>
+                <div className="rounded-2xl bg-[color:var(--accent-soft)]/70 px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
+                  {lang === "nl"
+                    ? "De simulator toont een indicatie op basis van je gekozen onderdelen."
+                    : "The simulator shows an estimate based on your selected components."}
                 </div>
 
                 <div className="rounded-2xl border border-dashed border-[color:var(--border)] px-4 py-4">
@@ -199,8 +177,7 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
 
           <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:rgba(255,248,240,0.72)] p-5 text-sm leading-7 text-[color:var(--muted)]">
             <p>{lang === "nl" ? `Laatst bijgewerkt: ${new Date(pricingData.fetchedAt).toLocaleString("nl-BE")}` : `Last updated: ${new Date(pricingData.fetchedAt).toLocaleString("en-GB")}`}</p>
-            <p className="mt-2">{lang === "nl" ? "Vergelijkte winkels" : "Compared stores"}: {pricingData.retailers.join(", ")}</p>
-            <p className="mt-3">{lang === "nl" ? "Bij een aanvraag vergelijken we de onderdelen opnieuw en sturen we de goedkoopste haalbare combinatie door voor jouw moment van aankoop." : "When you request a quote, we compare the parts again and send the cheapest workable combination for the time you place your order."}</p>
+            <p className="mt-3">{lang === "nl" ? "Bij een aanvraag valideren we je configuratie opnieuw en sturen we een finale offerte op maat." : "When you request a quote, we validate your configuration again and send a final tailored quote."}</p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <Link href={quoteLink} className="story-link inline-flex">{lang === "nl" ? "Vraag deze configuratie aan" : "Request this configuration"}</Link>
               <Link href={buildLocalizedHref("/pc-builder", lang === "nl" ? "" : "lang=en", lang)} className="story-link inline-flex">{lang === "nl" ? "Open volledige builder" : "Open full builder"}</Link>

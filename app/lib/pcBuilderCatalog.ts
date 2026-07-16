@@ -194,6 +194,12 @@ const pcBuildComponents: PcBuildComponentGroup[] = [
         helper: "Sterke allround keuze met veel upgradepotentieel.",
         sourceId: "cpu-ryzen-5-9600x",
       },
+      {
+        id: "cpu-ryzen-7-7700",
+        label: "AMD Ryzen 7 7700",
+        price: 289,
+        helper: "Extra marge voor multitasken, creatie en latere upgrades.",
+      },
     ],
   },
   {
@@ -216,6 +222,12 @@ const pcBuildComponents: PcBuildComponentGroup[] = [
         helper: "Meer headroom voor 1440p, hogere instellingen en streaming.",
         sourceId: "gpu-rtx-5060ti",
       },
+      {
+        id: "gpu-rtx-5070",
+        label: "NVIDIA GeForce RTX 5070",
+        price: 629,
+        helper: "Voor wie hogere framerates en meer toekomstmarge wil.",
+      },
     ],
   },
   {
@@ -227,19 +239,25 @@ const pcBuildComponents: PcBuildComponentGroup[] = [
       {
         id: "ram-16gb-ddr5",
         label: "16 GB DDR5",
-        price: 79,
+        price: 229.9,
         helper: "Geschikt voor basisgaming, schoolwerk en lichte productiviteit.",
       },
       {
         id: "ram-32gb-ddr5",
         label: "32 GB DDR5",
-        price: 129,
+        price: 309.9,
         helper: "De beste allround keuze voor gaming en multitasken.",
+      },
+      {
+        id: "ram-48gb-ddr5",
+        label: "48 GB DDR5",
+        price: 389.9,
+        helper: "Comfortabele tussenstap voor zwaarder dagelijks werk.",
       },
       {
         id: "ram-64gb-ddr5",
         label: "64 GB DDR5",
-        price: 239,
+        price: 469.9,
         helper: "Voor zware creatieve workflows, veel tabs en grote projecten.",
       },
     ],
@@ -247,6 +265,14 @@ const pcBuildComponents: PcBuildComponentGroup[] = [
 ];
 
 export const pcPriceSources: PcPriceSource[] = [
+  {
+    id: "system-budget-home-5060",
+    label: "Budget desktop referentie",
+    retailer: "Interne referentie",
+    url: "https://ladeco.it/pc-builder",
+    fallbackPrice: 999,
+    provider: "alternate",
+  },
   {
     id: "system-casual-5060",
     label: "ALTERNATE Gamer Casual i5-5060 gaming pc",
@@ -376,6 +402,24 @@ export const pcPriceSources: PcPriceSource[] = [
 
 const pcBuildProfilesCatalog: PcProfileCatalogEntry[] = [
   {
+    id: "budget-home",
+    name: "Voordelige basis-pc",
+    audience: "dagelijks gebruik, school, lichte gaming",
+    description:
+      "Budgetvriendelijke instapconfiguratie voor vlot dagelijks gebruik met ruimte om later gericht te upgraden.",
+    category: "starter",
+    resolution: "1080p",
+    productSourceId: "system-budget-home-5060",
+    includes: [
+      "Volledig afgewerkte desktop",
+      "Geschikt voor dagelijks werk en studie",
+      "1 TB SSD-opslag",
+      "Upgradepad naar sterkere onderdelen later",
+    ],
+    marketAnchorSourceIds: ["gpu-rtx-5060", "cpu-ryzen-5-8400f"],
+    comparisonSourceIds: ["system-budget-home-5060"],
+  },
+  {
     id: "casual-5060",
     name: "Instap gaming",
     audience: "1080p gaming, school, dagelijks gebruik",
@@ -482,7 +526,6 @@ export function createPcPricingPayload(
 
     return {
       ...option,
-      label: source.label,
       price: snapshot.price,
       retailer: source.retailer,
       url: source.url,
@@ -516,15 +559,14 @@ export function createPcPricingPayload(
 
   const profiles = pcBuildProfilesCatalog.map((profile) => {
     const base = getSnapshot(profile.productSourceId);
-    const defaultBuild = {
-      cpu: profile.id === "casual-5060"
-        ? "cpu-ryzen-5-8400f"
-        : profile.id === "casual-5060ti"
-          ? "cpu-ryzen-7-8700f"
-          : "cpu-ryzen-5-9600x",
-      gpu: profile.id === "casual-5060ti" ? "gpu-rtx-5060ti" : "gpu-rtx-5060",
-      memory: profile.id === "casual-5060" ? "ram-16gb-ddr5" : "ram-32gb-ddr5",
-    };
+    const defaultBuild =
+      profile.id === "budget-home"
+        ? { cpu: "cpu-ryzen-5-8400f", gpu: "gpu-rtx-5060", memory: "ram-16gb-ddr5" }
+        : profile.id === "casual-5060"
+          ? { cpu: "cpu-ryzen-5-8400f", gpu: "gpu-rtx-5060", memory: "ram-16gb-ddr5" }
+          : profile.id === "casual-5060ti"
+            ? { cpu: "cpu-ryzen-7-8700f", gpu: "gpu-rtx-5060ti", memory: "ram-32gb-ddr5" }
+            : { cpu: "cpu-ryzen-5-9600x", gpu: "gpu-rtx-5060", memory: "ram-32gb-ddr5" };
     const platformPrice = getPlatformPrice(defaultBuild, base.snapshot.price);
     const marketAnchors = [profile.productSourceId, ...profile.marketAnchorSourceIds].map((sourceId) => {
       const { source, snapshot } = getSnapshot(sourceId);
@@ -579,10 +621,10 @@ export function createPcPricingPayload(
       liveSourceCount === sourceCount ? "live" : liveSourceCount > 0 ? "mixed" : "fallback",
     note:
       liveSourceCount === sourceCount
-        ? "Live prijzen opgehaald via meerdere winkels. Beschikbaarheid en dagprijzen kunnen nog wijzigen."
+        ? "Prijsdata wordt continu bijgewerkt voor een zo scherp mogelijke configuratie-inschatting."
         : liveSourceCount > 0
-          ? "Een deel van de prijzen is live opgehaald. Ontbrekende waarden vallen terug op de laatst gecontroleerde richtprijs."
-          : "Live prijsopvraging was niet beschikbaar. De simulator gebruikt de laatst gecontroleerde richtprijzen.",
+          ? "Prijsdata combineert recente metingen met laatst gecontroleerde richtprijzen wanneer data tijdelijk ontbreekt."
+          : "Prijsdata gebruikt momenteel de laatst gecontroleerde richtprijzen.",
     sourceCount,
     liveSourceCount,
     profiles,

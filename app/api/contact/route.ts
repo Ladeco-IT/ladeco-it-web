@@ -14,6 +14,12 @@ export async function POST(request: NextRequest) {
   const pcTotal = String(formData.get("pcTotal") || "").trim();
   const pcExtras = String(formData.get("pcExtras") || "").trim();
   const pcExtrasLabel = String(formData.get("pcExtrasLabel") || "").trim();
+  const pcComponents = String(formData.get("pcComponents") || "").trim();
+  const pcComponentsLabel = String(formData.get("pcComponentsLabel") || "").trim();
+  const pcApproval = String(formData.get("pcApproval") || "").trim();
+  const isPcLead = Boolean(pcLabel);
+  const approvalTag = pcApproval === "1" ? "AKKOORD" : "NOG TE BESPREKEN";
+  const subjectPrefix = isPcLead ? `[PC LEAD - ${approvalTag}] ` : "";
 
   const pcSummaryHtml = pcLabel
     ? `
@@ -22,13 +28,15 @@ export async function POST(request: NextRequest) {
                 <p style="margin: 0 0 8px;"><strong>Build:</strong> ${pcLabel}</p>
                 <p style="margin: 0 0 8px;"><strong>Totaal:</strong> € ${pcTotal || "onbekend"}</p>
                 <p style="margin: 0 0 8px;"><strong>Extra hardware:</strong> ${pcExtrasLabel || "Geen extra hardware-upgrades"}</p>
-                <p style="margin: 0;"><strong>Interne codes:</strong> profiel ${pcProfile || "n.v.t."}, extras ${pcExtras || "geen"}</p>
+                <p style="margin: 0 0 8px;"><strong>Componenten:</strong> ${pcComponentsLabel || "Niet opgegeven"}</p>
+                <p style="margin: 0 0 8px;"><strong>Akkoord prijsindicatie:</strong> ${pcApproval === "1" ? "Ja" : "Nee"}</p>
+                <p style="margin: 0;"><strong>Interne codes:</strong> profiel ${pcProfile || "n.v.t."}, components ${pcComponents || "geen"}, extras ${pcExtras || "geen"}</p>
               </div>
       `
     : "";
 
   const pcSummaryText = pcLabel
-    ? `\n\nPc-configuratie:\n- Build: ${pcLabel}\n- Totaal: € ${pcTotal || "onbekend"}\n- Extra hardware: ${pcExtrasLabel || "Geen extra hardware-upgrades"}\n- Interne codes: profiel ${pcProfile || "n.v.t."}, extras ${pcExtras || "geen"}`
+    ? `\n\nPc-configuratie:\n- Build: ${pcLabel}\n- Totaal: € ${pcTotal || "onbekend"}\n- Extra hardware: ${pcExtrasLabel || "Geen extra hardware-upgrades"}\n- Componenten: ${pcComponentsLabel || "Niet opgegeven"}\n- Akkoord prijsindicatie: ${pcApproval === "1" ? "Ja" : "Nee"}\n- Interne codes: profiel ${pcProfile || "n.v.t."}, components ${pcComponents || "geen"}, extras ${pcExtras || "geen"}`
     : "";
 
   if (!name || !email || !subject || !message) {
@@ -46,7 +54,7 @@ export async function POST(request: NextRequest) {
       from: `Ladeco IT <${from}>`,
       to,
       replyTo: email,
-      subject: `Nieuw bericht van ${name}: ${subject}`,
+      subject: `${subjectPrefix}Nieuw bericht van ${name}: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5; background: #f3f4f6; padding: 24px;">
           <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden;">
