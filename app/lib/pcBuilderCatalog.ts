@@ -12,6 +12,26 @@ export type PcUpgradeOption = {
   helper: string;
 };
 
+export type PcBuildComponentOption = {
+  id: string;
+  label: string;
+  price: number;
+  helper: string;
+  sourceId?: string;
+  retailer?: string;
+  url?: string;
+  isLive?: boolean;
+  sourceNote?: string;
+};
+
+export type PcBuildComponentGroup = {
+  id: "cpu" | "gpu" | "memory";
+  label: string;
+  helper: string;
+  defaultOptionId: string;
+  options: PcBuildComponentOption[];
+};
+
 export type PcPriceSource = {
   id: string;
   label: string;
@@ -46,6 +66,12 @@ export type PcBuildProfile = {
   category: "starter" | "gaming" | "creator";
   resolution: "1080p" | "1440p" | "mixed";
   basePrice: number;
+  platformPrice: number;
+  defaultBuild: {
+    cpu: string;
+    gpu: string;
+    memory: string;
+  };
   includes: string[];
   marketAnchors: PcMarketAnchor[];
   cheapestRetailer: string;
@@ -60,6 +86,7 @@ export type PcPricingPayload = {
   liveSourceCount: number;
   profiles: PcBuildProfile[];
   options: PcUpgradeOption[];
+  buildComponents: PcBuildComponentGroup[];
   retailers: string[];
 };
 
@@ -136,6 +163,86 @@ export const pcUpgradeOptions: PcUpgradeOption[] = [
     label: "Betere voeding met meer upgradebuffer",
     price: 85,
     helper: "Interessant als je later een sterkere videokaart plant.",
+  },
+];
+
+const pcBuildComponents: PcBuildComponentGroup[] = [
+  {
+    id: "cpu",
+    label: "CPU",
+    helper: "Kies de processor die het best past bij je workload en budget.",
+    defaultOptionId: "cpu-ryzen-5-8400f",
+    options: [
+      {
+        id: "cpu-ryzen-5-8400f",
+        label: "AMD Ryzen 5 8400F",
+        price: 139.9,
+        helper: "Solide instap voor gaming en dagelijks gebruik.",
+        sourceId: "cpu-ryzen-5-8400f",
+      },
+      {
+        id: "cpu-ryzen-7-8700f",
+        label: "AMD Ryzen 7 8700F",
+        price: 219.9,
+        helper: "Meer cores voor streaming, multitasken en zwaardere games.",
+        sourceId: "cpu-ryzen-7-8700f",
+      },
+      {
+        id: "cpu-ryzen-5-9600x",
+        label: "AMD Ryzen 5 9600X",
+        price: 199.9,
+        helper: "Sterke allround keuze met veel upgradepotentieel.",
+        sourceId: "cpu-ryzen-5-9600x",
+      },
+    ],
+  },
+  {
+    id: "gpu",
+    label: "GPU",
+    helper: "De videokaart bepaalt een groot deel van de gamingprestaties.",
+    defaultOptionId: "gpu-rtx-5060",
+    options: [
+      {
+        id: "gpu-rtx-5060",
+        label: "NVIDIA GeForce RTX 5060",
+        price: 339,
+        helper: "Voor soepel 1080p-gamen en een sterke prijs/prestatieverhouding.",
+        sourceId: "gpu-rtx-5060",
+      },
+      {
+        id: "gpu-rtx-5060ti",
+        label: "NVIDIA GeForce RTX 5060 Ti",
+        price: 399,
+        helper: "Meer headroom voor 1440p, hogere instellingen en streaming.",
+        sourceId: "gpu-rtx-5060ti",
+      },
+    ],
+  },
+  {
+    id: "memory",
+    label: "RAM",
+    helper: "Meer werkgeheugen geeft extra ruimte voor multitasken en creatieve software.",
+    defaultOptionId: "ram-32gb-ddr5",
+    options: [
+      {
+        id: "ram-16gb-ddr5",
+        label: "16 GB DDR5",
+        price: 79,
+        helper: "Geschikt voor basisgaming, schoolwerk en lichte productiviteit.",
+      },
+      {
+        id: "ram-32gb-ddr5",
+        label: "32 GB DDR5",
+        price: 129,
+        helper: "De beste allround keuze voor gaming en multitasken.",
+      },
+      {
+        id: "ram-64gb-ddr5",
+        label: "64 GB DDR5",
+        price: 239,
+        helper: "Voor zware creatieve workflows, veel tabs en grote projecten.",
+      },
+    ],
   },
 ];
 
@@ -362,8 +469,63 @@ export function createPcPricingPayload(
     };
   };
 
+  const getComponentOption = (option: PcBuildComponentOption) => {
+    if (!option.sourceId) {
+      return {
+        ...option,
+        isLive: false,
+        sourceNote: option.sourceNote ?? "Geschatte richtprijs",
+      };
+    }
+
+    const { source, snapshot } = getSnapshot(option.sourceId);
+
+    return {
+      ...option,
+      label: source.label,
+      price: snapshot.price,
+      retailer: source.retailer,
+      url: source.url,
+      isLive: snapshot.isLive,
+      sourceNote: snapshot.sourceNote,
+    };
+  };
+
+  const buildComponents = pcBuildComponents.map((group) => ({
+    ...group,
+    options: group.options.map(getComponentOption),
+  }));
+
+  const getBuildOptionPrice = (optionId: string) => {
+    for (const group of buildComponents) {
+      const option = group.options.find((entry) => entry.id === optionId);
+
+      if (option) {
+        return option.price;
+      }
+    }
+
+    throw new Error(`Onbekende pc-component: ${optionId}`);
+  };
+
+  const getPlatformPrice = (defaultBuild: { cpu: string; gpu: string; memory: string }, systemPrice: number) => {
+    const componentTotal = getBuildOptionPrice(defaultBuild.cpu) + getBuildOptionPrice(defaultBuild.gpu) + getBuildOptionPrice(defaultBuild.memory);
+
+    return Math.max(0, Number((systemPrice - componentTotal).toFixed(2)));
+  };
+
   const profiles = pcBuildProfilesCatalog.map((profile) => {
     const base = getSnapshot(profile.productSourceId);
+    const defaultBuild = {
+      cpu: profile.id === "casual-5060"
+        ? "cpu-ryzen-5-8400f"
+        : profile.id === "casual-5060ti"
+          ? "cpu-ryzen-7-8700f"
+          : "cpu-ryzen-5-9600x",
+      gpu: profile.id === "casual-5060ti" ? "gpu-rtx-5060ti" : "gpu-rtx-5060",
+      memory: profile.id === "casual-5060" ? "ram-16gb-ddr5" : "ram-32gb-ddr5",
+    };
+    const platformPrice = getPlatformPrice(defaultBuild, base.snapshot.price);
     const marketAnchors = [profile.productSourceId, ...profile.marketAnchorSourceIds].map((sourceId) => {
       const { source, snapshot } = getSnapshot(sourceId);
 
@@ -399,6 +561,8 @@ export function createPcPricingPayload(
       category: profile.category,
       resolution: profile.resolution,
       basePrice: base.snapshot.price,
+      platformPrice,
+      defaultBuild,
       includes: profile.includes,
       marketAnchors,
       cheapestRetailer: cheapestComparison.retailer,
@@ -423,6 +587,7 @@ export function createPcPricingPayload(
     liveSourceCount,
     profiles,
     options: pcUpgradeOptions,
+    buildComponents,
     retailers: [...new Set(pcPriceSources.map((source) => source.retailer))],
   };
 }

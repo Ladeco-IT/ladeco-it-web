@@ -16,6 +16,8 @@ type PcBuilderExperienceProps = {
   lang: Lang;
 };
 
+type ComponentGroupId = "cpu" | "gpu" | "memory";
+
 export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) {
   const { pricingData: rawPricingData, status, errorMessage, fallbackPricing } = usePcPricing(lang);
   const [category, setCategory] = useState<"all" | "starter" | "gaming" | "creator">("all");
@@ -62,6 +64,52 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
             helper: "Useful if you plan to install a stronger graphics card later.",
           };
         }),
+        buildComponents: rawPricingData.buildComponents.map((group) => ({
+          ...group,
+          label:
+            group.id === "cpu"
+              ? "CPU"
+              : group.id === "gpu"
+                ? "GPU"
+                : "RAM",
+          helper:
+            group.id === "cpu"
+              ? "Pick a processor that fits your workload and budget."
+              : group.id === "gpu"
+                ? "The graphics card drives most gaming performance."
+                : "More memory helps with multitasking and creative workloads.",
+          options: group.options.map((option) => {
+            if (group.id === "cpu") {
+              if (option.id === "cpu-ryzen-5-8400f") {
+                return { ...option, helper: "Good entry-level gaming and everyday use." };
+              }
+
+              if (option.id === "cpu-ryzen-7-8700f") {
+                return { ...option, helper: "Extra cores for streaming and heavier multitasking." };
+              }
+
+              return { ...option, helper: "Strong all-round pick with upgrade room." };
+            }
+
+            if (group.id === "gpu") {
+              if (option.id === "gpu-rtx-5060") {
+                return { ...option, helper: "Smooth 1080p gaming with strong value." };
+              }
+
+              return { ...option, helper: "More headroom for 1440p and higher settings." };
+            }
+
+            if (option.id === "ram-16gb-ddr5") {
+              return { ...option, helper: "Enough for basic gaming and school work." };
+            }
+
+            if (option.id === "ram-32gb-ddr5") {
+              return { ...option, helper: "Best all-round choice for most builds." };
+            }
+
+            return { ...option, helper: "For heavy creative projects and many open apps." };
+          }),
+        })),
         profiles: rawPricingData.profiles.map((profile) => {
           if (profile.id === "casual-5060") {
             return {
@@ -126,11 +174,39 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
       ? selectedOptionIds.filter((id) => id !== "storage-2tb")
       : selectedOptionIds;
 
+  const componentGroup = (groupId: ComponentGroupId) =>
+    pricingData.buildComponents.find((group) => group.id === groupId)
+    ?? fallbackPricing.buildComponents.find((group) => group.id === groupId)!;
+
+  const selectedProfile =
+    pricingData.profiles.find((profile) => profile.id === selectedProfileId) ?? pricingData.profiles[0] ?? fallbackPricing.profiles[0];
+
+  const defaultBuild = selectedProfile?.defaultBuild
+    ?? fallbackPricing.profiles[0]?.defaultBuild
+    ?? {
+      cpu: componentGroup("cpu").defaultOptionId,
+      gpu: componentGroup("gpu").defaultOptionId,
+      memory: componentGroup("memory").defaultOptionId,
+    };
+
+  const [selectedCpuId, setSelectedCpuId] = useState(defaultBuild.cpu);
+  const [selectedGpuId, setSelectedGpuId] = useState(defaultBuild.gpu);
+  const [selectedMemoryId, setSelectedMemoryId] = useState(defaultBuild.memory);
+
+  const selectedCpuGroup = componentGroup("cpu");
+  const selectedGpuGroup = componentGroup("gpu");
+  const selectedMemoryGroup = componentGroup("memory");
+
+  const selectedCpu = selectedCpuGroup.options.find((option) => option.id === selectedCpuId) ?? selectedCpuGroup.options[0];
+  const selectedGpu = selectedGpuGroup.options.find((option) => option.id === selectedGpuId) ?? selectedGpuGroup.options[0];
+  const selectedMemory = selectedMemoryGroup.options.find((option) => option.id === selectedMemoryId) ?? selectedMemoryGroup.options[0];
+
+  const selectedComponentTotal = selectedCpu.price + selectedGpu.price + selectedMemory.price;
   const selectedOptions = pricingData.options.filter((option) => effectiveOptionIds.includes(option.id));
   const extrasTotal = selectedOptions.reduce((sum, option) => sum + option.price, 0);
 
   const filteredProfiles = pricingData.profiles.filter((profile) => {
-    const total = profile.basePrice + extrasTotal;
+    const total = profile.platformPrice + selectedComponentTotal + extrasTotal;
 
     if (category !== "all" && profile.category !== category) {
       return false;
@@ -151,14 +227,13 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
     return true;
   });
 
-  const selectedProfile =
-    filteredProfiles.find((profile) => profile.id === selectedProfileId) ?? filteredProfiles[0] ?? pricingData.profiles[0];
+  const activeProfile = filteredProfiles.find((profile) => profile.id === selectedProfile?.id) ?? filteredProfiles[0] ?? selectedProfile;
 
-  const currentTotal = selectedProfile.basePrice + extrasTotal;
-  const selectedOptionLabels =
-    selectedOptions.map((option) => option.label).join(", ") ||
-    (lang === "nl" ? "Geen extra hardware-upgrades" : "No extra hardware upgrades");
-  const quoteSearch = `pcProfile=${encodeURIComponent(selectedProfile.id)}&pcLabel=${encodeURIComponent(selectedProfile.name)}&pcTotal=${encodeURIComponent(currentTotal.toFixed(2))}&pcExtras=${encodeURIComponent(effectiveOptionIds.join(","))}&pcExtrasLabel=${encodeURIComponent(selectedOptionLabels)}`;
+  const currentTotal = (activeProfile?.platformPrice ?? 0) + selectedComponentTotal + extrasTotal;
+  const presetTotal = (activeProfile?.basePrice ?? 0) + extrasTotal;
+  const selectedBuildLabel = `${activeProfile?.name ?? "PC build"} · ${selectedCpu.label} / ${selectedGpu.label} / ${selectedMemory.label}`;
+  const selectedOptionLabels = selectedOptions.map((option) => option.label).join(", ") || (lang === "nl" ? "Geen extra hardware-upgrades" : "No extra hardware upgrades");
+  const quoteSearch = `pcProfile=${encodeURIComponent(activeProfile?.id ?? "")}&pcLabel=${encodeURIComponent(selectedBuildLabel)}&pcTotal=${encodeURIComponent(currentTotal.toFixed(2))}&pcExtras=${encodeURIComponent(effectiveOptionIds.join(","))}&pcExtrasLabel=${encodeURIComponent(selectedOptionLabels)}`;
   const quoteLink = buildLocalizedHref("/contact", quoteSearch, lang);
 
   function toggleOption(optionId: string) {
@@ -167,6 +242,19 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
         ? current.filter((id) => id !== optionId)
         : [...current, optionId]
     );
+  }
+
+  function selectProfile(profileId: string) {
+    const profile = pricingData.profiles.find((entry) => entry.id === profileId);
+
+    if (!profile) {
+      return;
+    }
+
+    setSelectedProfileId(profile.id);
+    setSelectedCpuId(profile.defaultBuild.cpu);
+    setSelectedGpuId(profile.defaultBuild.gpu);
+    setSelectedMemoryId(profile.defaultBuild.memory);
   }
 
   return (
@@ -179,23 +267,19 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
           </h1>
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
             {lang === "nl"
-              ? "Deze pagina focust puur op de computer zelf. We vergelijken live prijzen uit meerdere winkels, filteren op jouw budget en tonen welke opbouw het meest logisch is voor jouw gebruik."
-              : "This page focuses purely on the computer itself. We compare live prices from several stores, filter by your budget and show which build makes the most sense for your use case."}
+              ? "Deze pagina focust puur op de computer zelf. Kies zelf CPU, GPU en RAM, vul daarna aan met extra hardware en zie meteen wat de build kost."
+              : "This page focuses purely on the computer itself. Pick CPU, GPU and RAM yourself, add extra hardware and see the build price update instantly."}
           </p>
-        </div>
-
-        <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-5 py-4 text-sm leading-7 text-[color:var(--muted)]">
-          <p>{pricingData.note}</p>
-          <p className="mt-2">
-            {lang === "nl" ? "Vergelijkte winkels" : "Compared stores"}: {pricingData.retailers.join(", ")}
-          </p>
-          <p className="mt-2">
-            {lang === "nl"
-              ? `${pricingData.liveSourceCount} van de ${pricingData.sourceCount} prijsbronnen zijn live opgehaald.`
-              : `${pricingData.liveSourceCount} of the ${pricingData.sourceCount} price sources were fetched live.`}
-          </p>
-          {status === "loading" ? <p className="mt-2">{lang === "nl" ? "Live prijzen worden opgehaald..." : "Fetching live prices..."}</p> : null}
-          {status === "error" ? <p className="mt-2">{errorMessage}</p> : null}
+          <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 text-sm leading-7 text-[color:var(--muted)]">
+            <p>{lang === "nl" ? pricingData.note : "Current market prices are fetched from multiple stores."}</p>
+            <p className="mt-2">
+              {lang === "nl"
+                ? `${pricingData.liveSourceCount} van de ${pricingData.sourceCount} prijsbronnen zijn live opgehaald.`
+                : `${pricingData.liveSourceCount} of the ${pricingData.sourceCount} price sources were fetched live.`}
+            </p>
+            {status === "loading" ? <p className="mt-2">{lang === "nl" ? "Live prijzen worden nu opgehaald..." : "Fetching live prices..."}</p> : null}
+            {status === "error" ? <p className="mt-2 text-[color:var(--accent)]">{errorMessage}</p> : null}
+          </div>
         </div>
       </section>
 
@@ -239,15 +323,17 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
           </label>
 
           <label className="block">
-            <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Goedkoopste winkel" : "Cheapest store"}</span>
+            <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Voorkeurswinkel" : "Preferred retailer"}</span>
             <select
               value={preferredRetailer}
               onChange={(event) => setPreferredRetailer(event.target.value)}
               className="mt-3 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none"
             >
-              <option value="all">{lang === "nl" ? "Maakt niet uit" : "Any"}</option>
+              <option value="all">{lang === "nl" ? "Alle winkels" : "All retailers"}</option>
               {pricingData.retailers.map((retailer) => (
-                <option key={retailer} value={retailer}>{retailer}</option>
+                <option key={retailer} value={retailer}>
+                  {retailer}
+                </option>
               ))}
             </select>
           </label>
@@ -281,6 +367,47 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
             </span>
           </label>
 
+          <div className="space-y-4 rounded-2xl border border-[color:var(--border)] px-4 py-4">
+            <div>
+              <p className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Kernconfiguratie" : "Core configuration"}</p>
+              <p className="mt-1 text-sm leading-6 text-[color:var(--muted)]">
+                {lang === "nl"
+                  ? "Kies zelf CPU, GPU en RAM. De totaalprijs wordt daarop herberekend."
+                  : "Pick CPU, GPU and RAM yourself. The total price is recalculated from those choices."}
+              </p>
+            </div>
+
+            {[selectedCpuGroup, selectedGpuGroup, selectedMemoryGroup].map((group) => {
+              const selectedValue = group.id === "cpu" ? selectedCpu.id : group.id === "gpu" ? selectedGpu.id : selectedMemory.id;
+
+              return (
+                <label key={group.id} className="block">
+                  <span className="text-sm font-semibold text-[color:var(--foreground)]">{group.label}</span>
+                  <select
+                    value={selectedValue}
+                    onChange={(event) => {
+                      if (group.id === "cpu") {
+                        setSelectedCpuId(event.target.value);
+                      } else if (group.id === "gpu") {
+                        setSelectedGpuId(event.target.value);
+                      } else {
+                        setSelectedMemoryId(event.target.value);
+                      }
+                    }}
+                    className="mt-3 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none"
+                  >
+                    {group.options.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.label} - {euro.format(option.price)}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="mt-2 block text-xs leading-5 text-[color:var(--muted)]">{group.helper}</span>
+                </label>
+              );
+            })}
+          </div>
+
           <div>
             <p className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Extra hardware" : "Extra hardware"}</p>
             <div className="mt-3 space-y-3">
@@ -309,14 +436,14 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
         <div className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredProfiles.map((profile) => {
-              const total = profile.basePrice + extrasTotal;
-              const isSelected = profile.id === selectedProfile.id;
+              const total = profile.platformPrice + selectedComponentTotal + extrasTotal;
+              const isSelected = profile.id === activeProfile?.id;
 
               return (
                 <button
                   key={profile.id}
                   type="button"
-                  onClick={() => setSelectedProfileId(profile.id)}
+                  onClick={() => selectProfile(profile.id)}
                   className={`rounded-[1.5rem] border p-5 text-left transition ${
                     isSelected
                       ? "border-[color:var(--accent)] bg-[color:var(--surface)] shadow-[0_18px_40px_rgba(36,25,19,0.08)]"
@@ -328,6 +455,9 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
                   <p className="mt-4 text-2xl font-semibold text-[color:var(--foreground)]">{euro.format(total)}</p>
                   <p className="mt-2 text-xs leading-5 text-[color:var(--accent)]">
                     {lang === "nl" ? "Goedkoopste bron" : "Cheapest source"}: {profile.cheapestRetailer} ({euro.format(profile.cheapestTotal)})
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-[color:var(--muted)]">
+                    {lang === "nl" ? "Platformbasis" : "Platform base"}: {euro.format(profile.platformPrice)}
                   </p>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">{profile.description}</p>
                 </button>
@@ -341,14 +471,33 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
             </div>
           ) : null}
 
-          {selectedProfile ? (
+          {activeProfile ? (
             <section className="panel-soft grid gap-6 p-6 lg:grid-cols-[0.92fr_1.08fr]">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">{lang === "nl" ? "Gekozen build" : "Selected build"}</p>
-                <h2 className="mt-3 text-2xl font-semibold text-[color:var(--foreground)]">{selectedProfile.name}</h2>
-                <p className="mt-3 text-base leading-7 text-[color:var(--muted)]">{selectedProfile.description}</p>
+                <h2 className="mt-3 text-2xl font-semibold text-[color:var(--foreground)]">{activeProfile.name}</h2>
+                <p className="mt-3 text-base leading-7 text-[color:var(--muted)]">{activeProfile.description}</p>
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">CPU</p>
+                    <p className="mt-2 text-sm font-semibold text-[color:var(--foreground)]">{selectedCpu.label}</p>
+                    <p className="mt-1 text-xs text-[color:var(--muted)]">{euro.format(selectedCpu.price)}</p>
+                  </div>
+                  <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">GPU</p>
+                    <p className="mt-2 text-sm font-semibold text-[color:var(--foreground)]">{selectedGpu.label}</p>
+                    <p className="mt-1 text-xs text-[color:var(--muted)]">{euro.format(selectedGpu.price)}</p>
+                  </div>
+                  <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">RAM</p>
+                    <p className="mt-2 text-sm font-semibold text-[color:var(--foreground)]">{selectedMemory.label}</p>
+                    <p className="mt-1 text-xs text-[color:var(--muted)]">{euro.format(selectedMemory.price)}</p>
+                  </div>
+                </div>
+
                 <ul className="mt-5 space-y-2 text-sm leading-6 text-[color:var(--muted)]">
-                  {selectedProfile.includes.map((item) => (
+                  {activeProfile.includes.map((item) => (
                     <li key={item} className="flex gap-2">
                       <span aria-hidden="true" className="text-[color:var(--accent)]">•</span>
                       <span>{item}</span>
@@ -359,8 +508,12 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
 
               <div className="space-y-4 rounded-[1.4rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-5">
                 <div className="flex items-start justify-between gap-4">
-                  <span className="text-sm text-[color:var(--muted)]">{lang === "nl" ? "Basisconfiguratie" : "Base configuration"}</span>
-                  <span className="text-sm font-semibold text-[color:var(--foreground)]">{euro.format(selectedProfile.basePrice)}</span>
+                  <span className="text-sm text-[color:var(--muted)]">{lang === "nl" ? "Platformbasis" : "Platform base"}</span>
+                  <span className="text-sm font-semibold text-[color:var(--foreground)]">{euro.format(activeProfile.platformPrice)}</span>
+                </div>
+                <div className="flex items-start justify-between gap-4">
+                  <span className="text-sm text-[color:var(--muted)]">CPU / GPU / RAM</span>
+                  <span className="text-sm font-semibold text-[color:var(--foreground)]">{euro.format(selectedComponentTotal)}</span>
                 </div>
                 <div className="flex items-start justify-between gap-4">
                   <span className="text-sm text-[color:var(--muted)]">{lang === "nl" ? "Extra hardware" : "Extra hardware"}</span>
@@ -372,11 +525,16 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
                 </div>
                 <div className="rounded-2xl bg-[color:var(--accent-soft)]/70 px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
                   {lang === "nl"
-                    ? <>Goedkoopste bron voor deze selectie nu: <span className="font-semibold text-[color:var(--foreground)]">{selectedProfile.cheapestRetailer}</span> rond <span className="font-semibold text-[color:var(--foreground)]">{euro.format(selectedProfile.cheapestTotal)}</span>.</>
-                    : <>Cheapest source for this selection right now: <span className="font-semibold text-[color:var(--foreground)]">{selectedProfile.cheapestRetailer}</span> around <span className="font-semibold text-[color:var(--foreground)]">{euro.format(selectedProfile.cheapestTotal)}</span>.</>}
+                    ? <>Presetprijs met deze keuzes: <span className="font-semibold text-[color:var(--foreground)]">{euro.format(presetTotal)}</span>. Verschil met jouw custom build: <span className="font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal - presetTotal)}</span>.</>
+                    : <>Preset price with these choices: <span className="font-semibold text-[color:var(--foreground)]">{euro.format(presetTotal)}</span>. Difference versus your custom build: <span className="font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal - presetTotal)}</span>.</>}
+                </div>
+                <div className="rounded-2xl bg-[color:var(--accent-soft)]/70 px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
+                  {lang === "nl"
+                    ? <>Goedkoopste bron voor deze selectie nu: <span className="font-semibold text-[color:var(--foreground)]">{activeProfile.cheapestRetailer}</span> rond <span className="font-semibold text-[color:var(--foreground)]">{euro.format(activeProfile.cheapestTotal)}</span>.</>
+                    : <>Cheapest source for this selection right now: <span className="font-semibold text-[color:var(--foreground)]">{activeProfile.cheapestRetailer}</span> around <span className="font-semibold text-[color:var(--foreground)]">{euro.format(activeProfile.cheapestTotal)}</span>.</>}
                 </div>
                 <div className="space-y-2">
-                  {selectedProfile.marketAnchors.map((anchor) => (
+                  {activeProfile.marketAnchors.map((anchor) => (
                     <div key={anchor.id} className="rounded-2xl border border-[color:var(--border)]/70 px-4 py-3">
                       <div className="flex items-start justify-between gap-4">
                         <div>
