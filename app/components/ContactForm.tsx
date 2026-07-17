@@ -26,8 +26,8 @@ export default function ContactForm({ lang }: ContactFormProps) {
   const [subjectValue, setSubjectValue] = useState(() =>
     pcLabel
       ? lang === "nl"
-        ? `Offerteaanvraag pc-configuratie: ${pcLabel}`
-        : `Quote request for PC configuration: ${pcLabel}`
+        ? "Offerteaanvraag pc-configuratie"
+        : "Quote request for PC configuration"
       : ""
   );
   const [messageValue, setMessageValue] = useState(() =>
