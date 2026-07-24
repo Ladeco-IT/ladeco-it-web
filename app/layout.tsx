@@ -79,32 +79,44 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18315148229"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'AW-18315148229');
+            `,
+          }}
+        />
         <link rel="icon" href="/logo.png" media="(prefers-color-scheme: light)" />
         <link rel="icon" href="/logo-dark.png" media="(prefers-color-scheme: dark)" />
         <script dangerouslySetInnerHTML={{ __html: `
-(function(){
-  try {
-    var light = '/logo.png';
-    var dark = '/logo-dark.png';
-    function setFavicon(href){
-      var link = document.querySelector("link[id='dynamic-favicon']");
-      if(!link){
-        link = document.createElement('link');
-        link.id = 'dynamic-favicon';
-        link.rel = 'icon';
-        document.head.appendChild(link);
-      }
-      link.href = href;
-    }
-    var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-    function update(){ setFavicon(mq && mq.matches ? dark : light); }
-    update();
-    if(mq && mq.addEventListener) mq.addEventListener('change', update);
-  } catch(e){}
-})();
-        ` }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: `
-{"@context":"https://schema.org","@type":"Organization","name":"Ladeco IT","url":"https://ladeco-it.com","logo":"https://ladeco-it.com/logo.png"}
+        (function(){
+          try {
+            var light = '/logo.png';
+            var dark = '/logo-dark.png';
+            function setFavicon(href){
+              var link = document.querySelector("link[id='dynamic-favicon']");
+              if(!link){
+                link = document.createElement('link');
+                link.id = 'dynamic-favicon';
+                link.rel = 'icon';
+                document.head.appendChild(link);
+              }
+              link.href = href;
+            }
+            var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+            function update(){ setFavicon(mq && mq.matches ? dark : light); }
+            update();
+            if(mq && mq.addEventListener) mq.addEventListener('change', update);
+          } catch(e){}
+        })();
+                ` }} />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: `
+        {"@context":"https://schema.org","@type":"Organization","name":"Ladeco IT","url":"https://ladeco-it.com","logo":"https://ladeco-it.com/logo.png"}
         ` }} />
       </head>
       <body className="min-h-full bg-slate-50 text-slate-950 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
