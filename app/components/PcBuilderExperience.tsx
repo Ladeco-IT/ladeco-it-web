@@ -359,12 +359,17 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
       return;
     }
 
-    // Reset to a broad profile view so the chosen card configuration is reflected immediately.
-    setUsageIntent("balanced");
     setSelectedProfileId(profile.id);
-    setSelectedCpuId(profile.defaultBuild.cpu);
-    setSelectedGpuId(profile.defaultBuild.gpu);
-    setSelectedMemoryId(profile.defaultBuild.memory);
+  }
+
+  function applyActiveProfileDefaults() {
+    if (!activeProfile) {
+      return;
+    }
+
+    setSelectedCpuId(activeProfile.defaultBuild.cpu);
+    setSelectedGpuId(activeProfile.defaultBuild.gpu);
+    setSelectedMemoryId(activeProfile.defaultBuild.memory);
   }
 
   function applyRecommendedBuild() {
@@ -549,6 +554,12 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
         </aside>
 
         <div className="space-y-6">
+          <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm leading-6 text-[color:var(--muted)]">
+            {lang === "nl"
+              ? "Tip: een klik op een configuratiekaart wisselt alleen het profiel. Je CPU, GPU, RAM en extra opties blijven behouden totdat je ze zelf wijzigt."
+              : "Tip: clicking a configuration card switches only the profile. Your CPU, GPU, RAM and extra options stay unchanged until you adjust them yourself."}
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredProfiles.map((profile) => {
               const total = profile.platformPrice + selectedComponentTotal + extrasTotal;
@@ -571,6 +582,9 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
                   <p className="mt-2 text-xs leading-5 text-[color:var(--muted)]">
                     {lang === "nl" ? "Platformbasis" : "Platform base"}: {euro.format(profile.platformPrice)}
                   </p>
+                  <p className="mt-2 text-xs leading-5 text-[color:var(--muted)]">
+                    {lang === "nl" ? "Klik selecteert alleen dit profiel." : "Click selects this profile only."}
+                  </p>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">{profile.description}</p>
                 </button>
               );
@@ -588,6 +602,11 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">{lang === "nl" ? "Gekozen build" : "Selected build"}</p>
                 <h2 className="mt-3 text-2xl font-semibold text-[color:var(--foreground)]">{activeProfile.name}</h2>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)]">
+                    {lang === "nl" ? "Actief profiel" : "Active profile"}: {activeProfile.name}
+                  </span>
+                </div>
                 <p className="mt-3 text-base leading-7 text-[color:var(--muted)]">{activeProfile.description}</p>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -644,6 +663,23 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
                   {lang === "nl"
                     ? "Deze prijs is een indicatie op basis van je gekozen onderdelen en profiel."
                     : "This price is an estimate based on your selected parts and profile."}
+                </div>
+                <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4">
+                  <p className="text-sm font-semibold text-[color:var(--foreground)]">
+                    {lang === "nl" ? "Profielstandaard toepassen" : "Apply profile defaults"}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
+                    {lang === "nl"
+                      ? "Wil je exact de standaardonderdelen van dit profiel? Pas ze bewust toe met deze knop."
+                      : "Want the exact default parts for this profile? Apply them deliberately with this button."}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={applyActiveProfileDefaults}
+                    className="mt-3 rounded-xl border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2 text-xs font-semibold text-[color:var(--foreground)] transition hover:border-[color:var(--accent)]"
+                  >
+                    {lang === "nl" ? "Gebruik profiel-standaard CPU/GPU/RAM" : "Use profile default CPU/GPU/RAM"}
+                  </button>
                 </div>
                 <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">
