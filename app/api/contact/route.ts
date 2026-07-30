@@ -17,9 +17,12 @@ export async function POST(request: NextRequest) {
   const pcComponents = String(formData.get("pcComponents") || "").trim();
   const pcComponentsLabel = String(formData.get("pcComponentsLabel") || "").trim();
   const pcApproval = String(formData.get("pcApproval") || "").trim();
+  const pcOrderIntent = String(formData.get("pcOrderIntent") || "").trim();
   const isPcLead = Boolean(pcLabel);
+  const isOrderIntent = pcOrderIntent === "1";
   const approvalTag = pcApproval === "1" ? "AKKOORD" : "NOG TE BESPREKEN";
-  const subjectPrefix = isPcLead ? `[PC LEAD - ${approvalTag}] ` : "";
+  const orderTag = isOrderIntent ? "BETAALLINK GEWENST" : "OFFERTETRAJECT";
+  const subjectPrefix = isPcLead ? `[PC LEAD - ${approvalTag} - ${orderTag}] ` : "";
 
   const pcSummaryHtml = pcLabel
     ? `
@@ -30,13 +33,14 @@ export async function POST(request: NextRequest) {
                 <p style="margin: 0 0 8px;"><strong>Extra hardware:</strong> ${pcExtrasLabel || "Geen extra hardware-upgrades"}</p>
                 <p style="margin: 0 0 8px;"><strong>Componenten:</strong> ${pcComponentsLabel || "Niet opgegeven"}</p>
                 <p style="margin: 0 0 8px;"><strong>Akkoord prijsindicatie:</strong> ${pcApproval === "1" ? "Ja" : "Nee"}</p>
+                <p style="margin: 0 0 8px;"><strong>Bestellen + betaallink:</strong> ${isOrderIntent ? "Ja" : "Nee"}</p>
                 <p style="margin: 0;"><strong>Interne codes:</strong> profiel ${pcProfile || "n.v.t."}, components ${pcComponents || "geen"}, extras ${pcExtras || "geen"}</p>
               </div>
       `
     : "";
 
   const pcSummaryText = pcLabel
-    ? `\n\nPc-configuratie:\n- Build: ${pcLabel}\n- Totaal: € ${pcTotal || "onbekend"}\n- Extra hardware: ${pcExtrasLabel || "Geen extra hardware-upgrades"}\n- Componenten: ${pcComponentsLabel || "Niet opgegeven"}\n- Akkoord prijsindicatie: ${pcApproval === "1" ? "Ja" : "Nee"}\n- Interne codes: profiel ${pcProfile || "n.v.t."}, components ${pcComponents || "geen"}, extras ${pcExtras || "geen"}`
+    ? `\n\nPc-configuratie:\n- Build: ${pcLabel}\n- Totaal: € ${pcTotal || "onbekend"}\n- Extra hardware: ${pcExtrasLabel || "Geen extra hardware-upgrades"}\n- Componenten: ${pcComponentsLabel || "Niet opgegeven"}\n- Akkoord prijsindicatie: ${pcApproval === "1" ? "Ja" : "Nee"}\n- Bestellen + betaallink: ${isOrderIntent ? "Ja" : "Nee"}\n- Interne codes: profiel ${pcProfile || "n.v.t."}, components ${pcComponents || "geen"}, extras ${pcExtras || "geen"}`
     : "";
 
   if (!name || !email || !subject || !message) {

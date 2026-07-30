@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import {
+  PcCatalogOverride,
   PcPriceSnapshot,
   createPcPricingPayload,
   pcPriceSources,
@@ -121,6 +122,105 @@ async function fetchSourceSnapshot(source: (typeof pcPriceSources)[number]) {
   throw new Error(`Niet-ondersteunde prijsprovider voor ${source.id}`);
 }
 
+type SyncedCatalogResponse = {
+  ok?: boolean;
+  catalog?: {
+    note?: string;
+    groups?: Array<{
+      id: string;
+      label: string;
+      helper: string;
+      defaultOptionId: string;
+      options: Array<{
+        id: string;
+        label: string;
+        price: number;
+        helper: string;
+        imageUrl?: string;
+        imageAlt?: string;
+        brand?: "amd" | "intel" | "nvidia" | "other";
+        platform?: "all" | "amd" | "intel";
+        retailer?: string;
+        productUrl?: string;
+      }>;
+    }>;
+    upgrades?: Array<{
+      id: string;
+      label: string;
+      price: number;
+      helper: string;
+    }>;
+  };
+};
+
+function normalizeCatalogOverride(payload: SyncedCatalogResponse): PcCatalogOverride | null {
+  if (!payload.catalog?.groups || payload.catalog.groups.length === 0) {
+    return null;
+  }
+
+  const buildComponents = payload.catalog.groups.map((group) => ({
+    id: group.id,
+    label: group.label,
+    helper: group.helper,
+    defaultOptionId: group.defaultOptionId,
+    options: group.options.map((option) => ({
+      id: option.id,
+      label: option.label,
+      price: option.price,
+      helper: option.helper,
+      imageUrl: option.imageUrl,
+      imageAlt: option.imageAlt,
+      brand: option.brand,
+      platform: option.platform,
+      retailer: option.retailer,
+      url: option.productUrl,
+    })),
+  }));
+
+  const options = (payload.catalog.upgrades ?? []).map((upgrade) => ({
+    id: upgrade.id,
+    label: upgrade.label,
+    price: upgrade.price,
+    helper: upgrade.helper,
+  }));
+
+  return {
+    note: payload.catalog.note
+      ? `Catalogus gesynchroniseerd vanuit admin-web (${payload.catalog.note}).`
+      : "Catalogus gesynchroniseerd vanuit admin-web.",
+    buildComponents,
+    options,
+  };
+}
+
+async function fetchSyncedCatalogOverride(): Promise<PcCatalogOverride | null> {
+  const syncUrl = process.env.PC_CATALOG_SYNC_URL?.trim();
+
+  if (!syncUrl) {
+    return null;
+  }
+
+  const syncToken = process.env.PC_CATALOG_SYNC_TOKEN?.trim();
+
+  try {
+    const response = await fetch(syncUrl, {
+      cache: "no-store",
+      headers: {
+        ...(syncToken ? { "x-pc-catalog-token": syncToken } : {}),
+      },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = (await response.json()) as SyncedCatalogResponse;
+    return normalizeCatalogOverride(payload);
+  } catch {
+    return null;
+  }
+}
+
 export async function GET() {
   const results = await Promise.allSettled(
     pcPriceSources.map(async (source) => ({
@@ -137,7 +237,8 @@ export async function GET() {
     }
   }
 
-  const payload = createPcPricingPayload(liveSnapshots, new Date().toISOString());
+  const syncedCatalogOverride = await fetchSyncedCatalogOverride();
+  const payload = createPcPricingPayload(liveSnapshots, new Date().toISOString(), syncedCatalogOverride ?? undefined);
 
   return NextResponse.json(payload, {
     headers: {

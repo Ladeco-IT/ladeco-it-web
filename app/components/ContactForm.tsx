@@ -22,12 +22,14 @@ export default function ContactForm({ lang }: ContactFormProps) {
   const pcComponents = searchParams.get("pcComponents") || "";
   const pcComponentsLabel = searchParams.get("pcComponentsLabel") || "";
   const pcApproval = searchParams.get("pcApproval") || "";
+  const pcOrderIntent = searchParams.get("pcOrderIntent") || "";
+  const isOrderIntent = pcOrderIntent === "1";
   const success = searchParams.get("success") === "1";
   const [subjectValue, setSubjectValue] = useState(() =>
     pcLabel
       ? lang === "nl"
-        ? "Offerteaanvraag pc-configuratie"
-        : "Quote request for PC configuration"
+        ? (isOrderIntent ? "Bestelaanvraag pc-configuratie + betaallink" : "Offerteaanvraag pc-configuratie")
+        : (isOrderIntent ? "PC order request + payment link" : "Quote request for PC configuration")
       : ""
   );
   const [messageValue, setMessageValue] = useState(() =>
@@ -39,6 +41,7 @@ Ik wil graag meer info en een offerte voor deze pc-configuratie:
 - Build: ${pcLabel}
 - Geschatte totaalprijs: € ${pcTotal || "onbekend"}
 - Extra hardware: ${pcExtrasLabel || "Geen extra hardware-upgrades"}
+- Bestellen + betaallink: ${isOrderIntent ? "Ja" : "Nee"}
 
 Mijn vragen of voorkeuren:
 `
@@ -48,6 +51,7 @@ I would like more information and a quote for this PC configuration:
 - Build: ${pcLabel}
 - Estimated total price: € ${pcTotal || "unknown"}
 - Extra hardware: ${pcExtrasLabel || "No extra hardware upgrades"}
+- Order + payment link: ${isOrderIntent ? "Yes" : "No"}
 
 My questions or preferences:
 `
@@ -64,6 +68,7 @@ My questions or preferences:
         extrasLabel: "Extra hardware",
         componentsLabel: "Componentkeuze",
         approvalLabel: "Akkoord op indicatie",
+        orderIntentLabel: "Bestellen + betaallink",
         approvalYes: "Ja",
         approvalNo: "Nee",
         flowTitle: "Wat gebeurt er na je aanvraag?",
@@ -88,6 +93,7 @@ My questions or preferences:
         extrasLabel: "Extra hardware",
         componentsLabel: "Component selection",
         approvalLabel: "Approved estimate",
+        orderIntentLabel: "Order + payment link",
         approvalYes: "Yes",
         approvalNo: "No",
         flowTitle: "What happens after your request?",
@@ -162,6 +168,7 @@ My questions or preferences:
             <p className="mt-1">{copy.extrasLabel}: {pcExtrasLabel || (lang === "nl" ? "Geen extra hardware-upgrades" : "No extra hardware upgrades")}</p>
             <p className="mt-1">{copy.componentsLabel}: {pcComponentsLabel || (lang === "nl" ? "Niet opgegeven" : "Not provided")}</p>
             <p className="mt-1">{copy.approvalLabel}: {pcApproval === "1" ? copy.approvalYes : copy.approvalNo}</p>
+            <p className="mt-1">{copy.orderIntentLabel}: {isOrderIntent ? copy.approvalYes : copy.approvalNo}</p>
           </div>
         ) : null}
 
@@ -235,6 +242,7 @@ My questions or preferences:
         <input type="hidden" name="pcComponents" value={pcComponents} />
         <input type="hidden" name="pcComponentsLabel" value={pcComponentsLabel} />
         <input type="hidden" name="pcApproval" value={pcApproval} />
+        <input type="hidden" name="pcOrderIntent" value={pcOrderIntent} />
         <button
           type="submit"
           disabled={isSubmitting}

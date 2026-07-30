@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { usePcPricing } from "./usePcPricing";
 import { buildLocalizedHref, type Lang } from "../lib/i18n";
@@ -16,332 +17,227 @@ type PcBuilderExperienceProps = {
   lang: Lang;
 };
 
-type ComponentGroupId = "cpu" | "gpu" | "memory";
 type UsageIntent = "balanced" | "daily" | "student" | "gaming" | "creator" | "future";
+type BuildPlatform = "all" | "amd" | "intel";
+
+const recommendedProfileByIntent: Record<UsageIntent, string> = {
+  balanced: "casual-5060",
+  daily: "budget-home",
+  student: "casual-5060",
+  gaming: "casual-5060ti",
+  creator: "starter-am5",
+  future: "starter-am5",
+};
+
+const recommendedExtrasByIntent: Record<UsageIntent, string[]> = {
+  balanced: ["storage-2tb"],
+  daily: [],
+  student: ["memory-upgrade"],
+  gaming: ["cooling-upgrade", "psu-upgrade"],
+  creator: ["memory-upgrade", "cooling-upgrade", "storage-2tb"],
+  future: ["storage-2tb", "psu-upgrade"],
+};
+
+const groupLabelEn: Record<string, string> = {
+  cpu: "CPU",
+  gpu: "GPU",
+  memory: "RAM",
+  motherboard: "Motherboard",
+  storage: "Storage",
+  cooler: "CPU cooling",
+  psu: "Power supply",
+  case: "Case",
+};
 
 export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) {
-  const { pricingData: rawPricingData, status, errorMessage, fallbackPricing } = usePcPricing(lang);
+  const { pricingData, status, errorMessage, fallbackPricing } = usePcPricing(lang);
   const [usageIntent, setUsageIntent] = useState<UsageIntent>("balanced");
-  const [budget, setBudget] = useState(1700);
-  const [needsTwoTb, setNeedsTwoTb] = useState(false);
+  const [platform, setPlatform] = useState<BuildPlatform>("all");
+  const [budget, setBudget] = useState(2200);
   const [isPriceApproved, setIsPriceApproved] = useState(false);
+  const [wantsOrderAndPaymentLink, setWantsOrderAndPaymentLink] = useState(false);
   const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState(fallbackPricing.profiles[0]?.id ?? "");
+  const [selectedComponentByGroup, setSelectedComponentByGroup] = useState<Record<string, string>>({});
 
-  const pricingData = lang === "nl"
-    ? rawPricingData
+  const copy = lang === "nl"
+    ? {
+        eyebrow: "Pc builder",
+        title: "Stel een volledige pc samen met echte onderdelen.",
+        intro: "Kies per onderdeel de hardware die je wil. De configurator berekent meteen je totaal en stuurt de volledige onderdelenlijst door voor offerte of bestelling.",
+        noteTitle: "Onderhoud voor je collega",
+        noteBody: "Je collega kan prijzen en onderdelen rechtstreeks aanpassen in app/lib/pcBuilderCatalog.ts. Nieuwe keuzes verschijnen automatisch in deze builder.",
+        loading: "Prijsdata wordt bijgewerkt...",
+        filtersTitle: "Filters",
+        filtersBody: "Stem de aanbeveling af op je gebruik en budget.",
+        usageLabel: "Jouw gebruiksprofiel",
+        platformLabel: "Platform",
+        platformHelp: "Kies AMD of Intel en we tonen alleen compatibele CPU- en moederbordkeuzes.",
+        platformAll: "Alles",
+        platformAmd: "AMD",
+        platformIntel: "Intel",
+        usage: {
+          balanced: "Allround",
+          daily: "Dagelijks gebruik",
+          student: "School en studie",
+          gaming: "Gaming",
+          creator: "Creatie (foto/video)",
+          future: "Toekomstgericht",
+        },
+        budgetLabel: "Maximaal budget",
+        profileTitle: "Aanbevolen profiel",
+        applyRecommendation: "Gebruik aanbevolen profiel",
+        extrasTitle: "Extra hardware en service",
+        extrasBody: "Selecteer extra upgrades die bovenop je onderdelenkeuze komen.",
+        profileBase: "Platformbasis",
+        noProfiles: "Geen configuraties binnen dit budget. Verhoog je budget of kies lichtere onderdelen.",
+        selectedBuild: "Gekozen build",
+        total: "Totaal",
+        selectedParts: "Onderdelen",
+        selectedExtras: "Extra hardware",
+        estimateNote: "Dit is een indicatieve prijs op basis van actuele en fallback marktdata.",
+        approvalTitle: "Stap 1 - prijsindicatie bevestigen",
+        approvalText: "Ik ga akkoord met deze prijsindicatie en wil deze configuratie laten nakijken.",
+        orderTitle: "Stap 2 - bestellen en betalen",
+        orderText: "Ik wil deze pc effectief bestellen en een betaallink ontvangen om de bestelling te bevestigen.",
+        quoteAction: "Vraag offerte aan",
+        orderAction: "Bestel en vraag betaallink",
+        generalContact: "Algemeen contact",
+        retailerLabel: "Referentie",
+        recommended: "Aanbevolen",
+      }
     : {
-        ...rawPricingData,
-        note: "Price data is continuously updated for our own configuration guidance.",
-        options: rawPricingData.options.map((option) => {
-          if (option.id === "storage-2tb") {
-            return {
-              ...option,
-              label: "Upgrade to 2 TB NVMe SSD",
-              helper: "More room for large games, media libraries and project files.",
-            };
-          }
-
-          if (option.id === "memory-upgrade") {
-            return {
-              ...option,
-              label: "Memory upgrade to a higher-end configuration",
-              helper: "Useful for streaming, heavy multitasking or creative software.",
-            };
-          }
-
-          if (option.id === "cooling-upgrade") {
-            return {
-              ...option,
-              label: "Quieter cooling and better airflow",
-              helper: "For lower temperatures and less noise under load.",
-            };
-          }
-
-          return {
-            ...option,
-            label: "Better power supply with extra upgrade headroom",
-            helper: "Useful if you plan to install a stronger graphics card later.",
-          };
-        }),
-        buildComponents: rawPricingData.buildComponents.map((group) => ({
-          ...group,
-          label:
-            group.id === "cpu"
-              ? "CPU"
-              : group.id === "gpu"
-                ? "GPU"
-                : "RAM",
-          helper:
-            group.id === "cpu"
-              ? "Pick a processor that fits your workload and budget."
-              : group.id === "gpu"
-                ? "The graphics card drives most gaming performance."
-                : "More memory helps with multitasking and creative workloads.",
-          options: group.options.map((option) => {
-            if (group.id === "cpu") {
-              if (option.id === "cpu-ryzen-5-8400f") {
-                return { ...option, helper: "Good entry-level gaming and everyday use." };
-              }
-
-              if (option.id === "cpu-ryzen-7-8700f") {
-                return { ...option, helper: "Extra cores for streaming and heavier multitasking." };
-              }
-
-              return { ...option, helper: "Strong all-round pick with upgrade room." };
-            }
-
-            if (group.id === "gpu") {
-              if (option.id === "gpu-rtx-5060") {
-                return { ...option, helper: "Smooth 1080p gaming with strong value." };
-              }
-
-              return { ...option, helper: "More headroom for 1440p and higher settings." };
-            }
-
-            if (option.id === "ram-16gb-ddr5") {
-              return { ...option, helper: "Enough for basic gaming and school work." };
-            }
-
-            if (option.id === "ram-32gb-ddr5") {
-              return { ...option, helper: "Best all-round choice for most builds." };
-            }
-
-            if (option.id === "ram-48gb-ddr5") {
-              return { ...option, helper: "Extra breathing room for heavier daily workflows." };
-            }
-
-            return { ...option, helper: "For heavy creative projects and many open apps." };
-          }),
-        })),
-        profiles: rawPricingData.profiles.map((profile) => {
-          if (profile.id === "budget-home") {
-            return {
-              ...profile,
-              name: "Affordable everyday PC",
-              audience: "daily use, school, light gaming",
-              description: "A budget-friendly starter PC for smooth everyday use with room to upgrade over time.",
-              includes: [
-                "Fully assembled desktop",
-                "Great for daily use and study",
-                "1 TB SSD storage",
-                "Upgrade-friendly platform",
-              ],
-            };
-          }
-
-          if (profile.id === "casual-5060") {
-            return {
-              ...profile,
-              name: "Entry gaming",
-              audience: "1080p gaming, school, everyday use",
-              description: "A full entry-level PC for popular games, schoolwork and a smooth daily workflow.",
-              includes: [
-                "Fully assembled desktop",
-                "RTX 5060-class graphics card",
-                "1 TB SSD storage",
-                "Suitable for 1080p gaming and general use",
-              ],
-              marketAnchors: profile.marketAnchors.map((anchor) => ({
-                ...anchor,
-                sourceNote: "Latest checked reference price",
-              })),
-            };
-          }
-
-          if (profile.id === "casual-5060ti") {
-            return {
-              ...profile,
-              name: "Strong all-round gaming",
-              audience: "1080p high, 1440p medium, streaming",
-              description: "More graphics headroom for heavier titles and a smoother multitasking experience.",
-              includes: [
-                "Fully assembled desktop",
-                "RTX 5060 Ti-class graphics card",
-                "More headroom for streaming and heavier games",
-                "A strong balance between price and performance",
-              ],
-              marketAnchors: profile.marketAnchors.map((anchor) => ({
-                ...anchor,
-                sourceNote: "Latest checked reference price",
-              })),
-            };
-          }
-
-          return {
-            ...profile,
-            name: "AM5 gaming starter",
-            audience: "1440p gaming, newer platform, easier upgrades later",
-            description: "For customers who want to start on a newer platform and grow more easily over time.",
-            includes: [
-              "Fully assembled desktop",
-              "AM5 platform for longer lifespan",
-              "1 TB SSD storage",
-              "Focused on upgrade-friendly gaming",
-            ],
-            marketAnchors: profile.marketAnchors.map((anchor) => ({
-              ...anchor,
-              sourceNote: "Latest checked reference price",
-            })),
-          };
-        }),
+        eyebrow: "PC builder",
+        title: "Build a complete PC with real hardware choices.",
+        intro: "Choose each part yourself. The configurator calculates your total instantly and sends the full parts list for quote or order handling.",
+        noteTitle: "Maintenance for your colleague",
+        noteBody: "Your colleague can update prices and part lists directly in app/lib/pcBuilderCatalog.ts. New options appear automatically in this builder.",
+        loading: "Updating price data...",
+        filtersTitle: "Filters",
+        filtersBody: "Tune recommendations to your use case and budget.",
+        usageLabel: "Your usage profile",
+        platformLabel: "Platform",
+        platformHelp: "Pick AMD or Intel and we only show compatible CPU and motherboard choices.",
+        platformAll: "All",
+        platformAmd: "AMD",
+        platformIntel: "Intel",
+        usage: {
+          balanced: "Balanced",
+          daily: "Everyday use",
+          student: "School and study",
+          gaming: "Gaming",
+          creator: "Creative work",
+          future: "Future-proof",
+        },
+        budgetLabel: "Maximum budget",
+        profileTitle: "Recommended profile",
+        applyRecommendation: "Use recommended profile",
+        extrasTitle: "Extra hardware and service",
+        extrasBody: "Select optional upgrades on top of your selected parts.",
+        profileBase: "Platform base",
+        noProfiles: "No configurations match this budget. Raise the budget or pick lighter components.",
+        selectedBuild: "Selected build",
+        total: "Total",
+        selectedParts: "Selected parts",
+        selectedExtras: "Extra hardware",
+        estimateNote: "This is an estimated price based on mixed live and fallback market data.",
+        approvalTitle: "Step 1 - approve estimate",
+        approvalText: "I agree with this estimate and want this configuration reviewed.",
+        orderTitle: "Step 2 - order and payment",
+        orderText: "I want to place this order and receive a payment link to confirm it.",
+        quoteAction: "Request quote",
+        orderAction: "Order and request payment link",
+        generalContact: "General contact",
+        retailerLabel: "Reference",
+        recommended: "Recommended",
       };
 
-  const componentIntentAllowList: Record<UsageIntent, Record<ComponentGroupId, string[] | null>> = {
-    balanced: { cpu: null, gpu: null, memory: null },
-    daily: {
-      cpu: ["cpu-ryzen-5-8400f", "cpu-ryzen-5-9600x"],
-      gpu: null,
-      memory: ["ram-16gb-ddr5", "ram-32gb-ddr5"],
-    },
-    student: {
-      cpu: ["cpu-ryzen-5-8400f", "cpu-ryzen-5-9600x"],
-      gpu: null,
-      memory: ["ram-16gb-ddr5", "ram-32gb-ddr5", "ram-48gb-ddr5"],
-    },
-    gaming: {
-      cpu: ["cpu-ryzen-5-8400f", "cpu-ryzen-5-9600x", "cpu-ryzen-7-8700f", "cpu-ryzen-7-7700"],
-      gpu: null,
-      memory: ["ram-16gb-ddr5", "ram-32gb-ddr5", "ram-48gb-ddr5"],
-    },
-    creator: {
-      cpu: ["cpu-ryzen-5-9600x", "cpu-ryzen-7-8700f", "cpu-ryzen-7-7700"],
-      gpu: null,
-      memory: ["ram-32gb-ddr5", "ram-48gb-ddr5", "ram-64gb-ddr5"],
-    },
-    future: {
-      cpu: ["cpu-ryzen-5-9600x", "cpu-ryzen-7-8700f", "cpu-ryzen-7-7700"],
-      gpu: null,
-      memory: ["ram-32gb-ddr5", "ram-48gb-ddr5", "ram-64gb-ddr5"],
-    },
-  };
+  const activePricing = pricingData.buildComponents.length > 0 ? pricingData : fallbackPricing;
+  const allGroups = activePricing.buildComponents;
 
-  const extraIntentAllowList: Record<UsageIntent, string[] | null> = {
-    balanced: null,
-    daily: ["psu-upgrade"],
-    student: ["memory-upgrade", "psu-upgrade"],
-    gaming: ["memory-upgrade", "cooling-upgrade", "psu-upgrade"],
-    creator: ["memory-upgrade", "cooling-upgrade"],
-    future: ["memory-upgrade", "psu-upgrade", "cooling-upgrade"],
-  };
+  const visibleGroups = useMemo(() => {
+    return allGroups.map((group) => {
+      if (group.id !== "cpu" && group.id !== "motherboard") {
+        return group;
+      }
 
-  const recommendedBuildByIntent: Record<UsageIntent, { cpu: string; gpu: string; memory: string }> = {
-    balanced: { cpu: "cpu-ryzen-5-9600x", gpu: "gpu-rtx-5060ti", memory: "ram-32gb-ddr5" },
-    daily: { cpu: "cpu-ryzen-5-8400f", gpu: "gpu-rtx-5060", memory: "ram-16gb-ddr5" },
-    student: { cpu: "cpu-ryzen-5-9600x", gpu: "gpu-rtx-5060", memory: "ram-32gb-ddr5" },
-    gaming: { cpu: "cpu-ryzen-7-8700f", gpu: "gpu-rtx-5060ti", memory: "ram-32gb-ddr5" },
-    creator: { cpu: "cpu-ryzen-7-7700", gpu: "gpu-rtx-5070", memory: "ram-64gb-ddr5" },
-    future: { cpu: "cpu-ryzen-7-7700", gpu: "gpu-rtx-5070", memory: "ram-48gb-ddr5" },
-  };
+      const options = group.options.filter((option) => {
+        if (platform === "all") {
+          return true;
+        }
 
-  const recommendedExtrasByIntent: Record<UsageIntent, string[]> = {
-    balanced: ["memory-upgrade"],
-    daily: [],
-    student: ["memory-upgrade"],
-    gaming: ["cooling-upgrade", "psu-upgrade"],
-    creator: ["memory-upgrade", "cooling-upgrade"],
-    future: ["psu-upgrade"],
-  };
+        const optionPlatform = option.platform ?? "all";
+        return optionPlatform === "all" || optionPlatform === platform;
+      });
 
-  const componentGroup = (groupId: ComponentGroupId) =>
-    pricingData.buildComponents.find((group) => group.id === groupId)
-    ?? fallbackPricing.buildComponents.find((group) => group.id === groupId)!;
+      if (options.length === 0) {
+        return group;
+      }
 
-  const selectedProfile =
-    pricingData.profiles.find((profile) => profile.id === selectedProfileId) ?? pricingData.profiles[0] ?? fallbackPricing.profiles[0];
+      return {
+        ...group,
+        options,
+        defaultOptionId: options.some((option) => option.id === group.defaultOptionId)
+          ? group.defaultOptionId
+          : options[0].id,
+      };
+    });
+  }, [allGroups, platform]);
 
-  const defaultBuild = selectedProfile?.defaultBuild
-    ?? fallbackPricing.profiles[0]?.defaultBuild
-    ?? {
-      cpu: componentGroup("cpu").defaultOptionId,
-      gpu: componentGroup("gpu").defaultOptionId,
-      memory: componentGroup("memory").defaultOptionId,
-    };
+  const profileById = useMemo(
+    () => new Map(pricingData.profiles.map((profile) => [profile.id, profile])),
+    [pricingData.profiles]
+  );
 
-  const [selectedCpuId, setSelectedCpuId] = useState(defaultBuild.cpu);
-  const [selectedGpuId, setSelectedGpuId] = useState(defaultBuild.gpu);
-  const [selectedMemoryId, setSelectedMemoryId] = useState(defaultBuild.memory);
+  const selectedProfile = profileById.get(selectedProfileId) ?? pricingData.profiles[0] ?? fallbackPricing.profiles[0];
 
-  const selectedCpuGroup = componentGroup("cpu");
-  const selectedGpuGroup = componentGroup("gpu");
-  const selectedMemoryGroup = componentGroup("memory");
+  const resolvedComponentByGroup = useMemo(() => {
+    const next: Record<string, string> = { ...selectedComponentByGroup };
 
-  const cpuAllowList = componentIntentAllowList[usageIntent].cpu;
-  const gpuAllowList = componentIntentAllowList[usageIntent].gpu;
-  const memoryAllowList = componentIntentAllowList[usageIntent].memory;
-  const extraAllowList = extraIntentAllowList[usageIntent];
+    for (const group of visibleGroups) {
+      const candidate = next[group.id]
+        ?? selectedProfile?.defaultBuild[group.id]
+        ?? group.defaultOptionId;
 
-  const visibleCpuOptions = cpuAllowList
-    ? selectedCpuGroup.options.filter((option) => cpuAllowList.includes(option.id))
-    : selectedCpuGroup.options;
-  const visibleGpuOptions = gpuAllowList
-    ? selectedGpuGroup.options.filter((option) => gpuAllowList.includes(option.id))
-    : selectedGpuGroup.options;
-  const visibleMemoryOptions = memoryAllowList
-    ? selectedMemoryGroup.options.filter((option) => memoryAllowList.includes(option.id))
-    : selectedMemoryGroup.options;
-  const visibleExtraOptions = pricingData.options.filter((option) => {
-    if (option.id === "storage-2tb") {
-      return false;
+      const exists = group.options.some((option) => option.id === candidate);
+      next[group.id] = exists ? candidate : group.defaultOptionId;
     }
 
-    if (!extraAllowList) {
-      return true;
-    }
+    return next;
+  }, [visibleGroups, selectedComponentByGroup, selectedProfile]);
 
-    return extraAllowList.includes(option.id);
+  const selectedEntries = visibleGroups.map((group) => {
+    const selectedOptionId = resolvedComponentByGroup[group.id] ?? group.defaultOptionId;
+    const selectedOption = group.options.find((option) => option.id === selectedOptionId) ?? group.options[0];
+
+    return { group, option: selectedOption };
   });
 
-  const activeCpuId = visibleCpuOptions.some((option) => option.id === selectedCpuId)
-    ? selectedCpuId
-    : (visibleCpuOptions[0]?.id ?? selectedCpuGroup.options[0]?.id ?? "");
-  const activeGpuId = visibleGpuOptions.some((option) => option.id === selectedGpuId)
-    ? selectedGpuId
-    : (visibleGpuOptions[0]?.id ?? selectedGpuGroup.options[0]?.id ?? "");
-  const activeMemoryId = visibleMemoryOptions.some((option) => option.id === selectedMemoryId)
-    ? selectedMemoryId
-    : (visibleMemoryOptions[0]?.id ?? selectedMemoryGroup.options[0]?.id ?? "");
-
-  const selectedCpu = visibleCpuOptions.find((option) => option.id === activeCpuId) ?? visibleCpuOptions[0] ?? selectedCpuGroup.options[0];
-  const selectedGpu = visibleGpuOptions.find((option) => option.id === activeGpuId) ?? visibleGpuOptions[0] ?? selectedGpuGroup.options[0];
-  const selectedMemory = visibleMemoryOptions.find((option) => option.id === activeMemoryId) ?? visibleMemoryOptions[0] ?? selectedMemoryGroup.options[0];
-
-  const recommendedBuild = recommendedBuildByIntent[usageIntent];
-  const recommendedExtras = recommendedExtrasByIntent[usageIntent];
-  const recommendedCpu = selectedCpuGroup.options.find((option) => option.id === recommendedBuild.cpu);
-  const recommendedGpu = selectedGpuGroup.options.find((option) => option.id === recommendedBuild.gpu);
-  const recommendedMemory = selectedMemoryGroup.options.find((option) => option.id === recommendedBuild.memory);
-
-  const scopedOptionIds = selectedOptionIds.filter((id) => visibleExtraOptions.some((option) => option.id === id));
-  const effectiveOptionIds = needsTwoTb && !scopedOptionIds.includes("storage-2tb")
-    ? [...scopedOptionIds, "storage-2tb"]
-    : !needsTwoTb && scopedOptionIds.includes("storage-2tb")
-      ? scopedOptionIds.filter((id) => id !== "storage-2tb")
-      : scopedOptionIds;
-
-  const selectedComponentTotal = selectedCpu.price + selectedGpu.price + selectedMemory.price;
-  const selectedOptions = pricingData.options.filter((option) => effectiveOptionIds.includes(option.id));
+  const selectedComponentTotal = selectedEntries.reduce((sum, entry) => sum + (entry.option?.price ?? 0), 0);
+  const selectedOptions = pricingData.options.filter((option) => selectedOptionIds.includes(option.id));
   const extrasTotal = selectedOptions.reduce((sum, option) => sum + option.price, 0);
 
   const filteredProfiles = pricingData.profiles.filter((profile) => {
     const total = profile.platformPrice + selectedComponentTotal + extrasTotal;
-
-    if (total > budget) {
-      return false;
-    }
-
-    return true;
+    return total <= budget;
   });
 
-  const activeProfile = filteredProfiles.find((profile) => profile.id === selectedProfile?.id) ?? filteredProfiles[0] ?? selectedProfile;
+  const activeProfile = filteredProfiles.find((profile) => profile.id === selectedProfile?.id)
+    ?? filteredProfiles[0]
+    ?? selectedProfile;
 
   const currentTotal = (activeProfile?.platformPrice ?? 0) + selectedComponentTotal + extrasTotal;
-  const presetTotal = (activeProfile?.basePrice ?? 0) + extrasTotal;
-  const selectedBuildLabel = `${activeProfile?.name ?? "PC build"} · ${selectedCpu.label} / ${selectedGpu.label} / ${selectedMemory.label}`;
-  const selectedComponentsLabel = `CPU: ${selectedCpu.label}, GPU: ${selectedGpu.label}, RAM: ${selectedMemory.label}`;
-  const selectedComponentIds = [selectedCpu.id, selectedGpu.id, selectedMemory.id].join(",");
-  const selectedOptionLabels = selectedOptions.map((option) => option.label).join(", ") || (lang === "nl" ? "Geen extra hardware-upgrades" : "No extra hardware upgrades");
-  const quoteSearch = `pcProfile=${encodeURIComponent(activeProfile?.id ?? "")}&pcLabel=${encodeURIComponent(selectedBuildLabel)}&pcTotal=${encodeURIComponent(currentTotal.toFixed(2))}&pcExtras=${encodeURIComponent(effectiveOptionIds.join(","))}&pcExtrasLabel=${encodeURIComponent(selectedOptionLabels)}&pcComponents=${encodeURIComponent(selectedComponentIds)}&pcComponentsLabel=${encodeURIComponent(selectedComponentsLabel)}&pcApproval=${isPriceApproved ? "1" : "0"}`;
+  const selectedComponentsLabel = selectedEntries
+    .map((entry) => `${entry.group.label}: ${entry.option?.label ?? "-"}`)
+    .join(", ");
+  const selectedComponentIds = selectedEntries
+    .map((entry) => `${entry.group.id}:${entry.option?.id ?? ""}`)
+    .join(",");
+  const selectedBuildLabel = `${activeProfile?.name ?? "PC build"} · ${selectedEntries.map((entry) => entry.option?.label ?? "").join(" / ")}`;
+  const selectedOptionLabels = selectedOptions.map((option) => option.label).join(", ")
+    || (lang === "nl" ? "Geen extra hardware-upgrades" : "No extra hardware upgrades");
+
+  const quoteSearch = `pcProfile=${encodeURIComponent(activeProfile?.id ?? "")}&pcLabel=${encodeURIComponent(selectedBuildLabel)}&pcTotal=${encodeURIComponent(currentTotal.toFixed(2))}&pcExtras=${encodeURIComponent(selectedOptionIds.join(","))}&pcExtrasLabel=${encodeURIComponent(selectedOptionLabels)}&pcComponents=${encodeURIComponent(selectedComponentIds)}&pcComponentsLabel=${encodeURIComponent(selectedComponentsLabel)}&pcApproval=${isPriceApproved ? "1" : "0"}&pcOrderIntent=${wantsOrderAndPaymentLink ? "1" : "0"}`;
   const quoteLink = buildLocalizedHref("/contact", quoteSearch, lang);
 
   function toggleOption(optionId: string) {
@@ -362,43 +258,51 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
     setSelectedProfileId(profile.id);
   }
 
-  function applyActiveProfileDefaults() {
+  function applyProfileDefaults() {
     if (!activeProfile) {
       return;
     }
 
-    setSelectedCpuId(activeProfile.defaultBuild.cpu);
-    setSelectedGpuId(activeProfile.defaultBuild.gpu);
-    setSelectedMemoryId(activeProfile.defaultBuild.memory);
+    const next: Record<string, string> = {};
+
+    for (const group of visibleGroups) {
+      next[group.id] = activeProfile.defaultBuild[group.id] ?? group.defaultOptionId;
+    }
+
+    setSelectedComponentByGroup(next);
   }
 
-  function applyRecommendedBuild() {
-    if (!recommendedBuild) {
+  function applyRecommendedProfile() {
+    const recommendedProfile = pricingData.profiles.find((profile) => profile.id === recommendedProfileByIntent[usageIntent]);
+
+    if (!recommendedProfile) {
       return;
     }
 
-    setSelectedCpuId(recommendedBuild.cpu);
-    setSelectedGpuId(recommendedBuild.gpu);
-    setSelectedMemoryId(recommendedBuild.memory);
-    setSelectedOptionIds(recommendedExtras);
+    setSelectedProfileId(recommendedProfile.id);
+
+    const next: Record<string, string> = {};
+    for (const group of visibleGroups) {
+      next[group.id] = recommendedProfile.defaultBuild[group.id] ?? group.defaultOptionId;
+    }
+
+    setSelectedComponentByGroup(next);
+    setSelectedOptionIds(recommendedExtrasByIntent[usageIntent]);
   }
+
+  const recommendedProfileName = pricingData.profiles.find((profile) => profile.id === recommendedProfileByIntent[usageIntent])?.name
+    ?? (lang === "nl" ? "Niet beschikbaar" : "Not available");
 
   return (
     <main className="space-y-10">
       <section className="panel-soft space-y-6 p-6 sm:p-8 lg:p-10">
         <div className="max-w-3xl space-y-4">
-          <p className="eyebrow">{lang === "nl" ? "Pc builder" : "PC builder"}</p>
-          <h1 className="headline text-4xl sm:text-5xl lg:text-6xl">
-            {lang === "nl" ? "Stel een voordelige pc samen op maat van je gebruik." : "Build a cost-efficient PC tailored to your use."}
-          </h1>
-          <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
-            {lang === "nl"
-              ? "Deze pagina focust puur op de computer zelf. Kies zelf CPU, GPU en RAM, vul daarna aan met extra hardware en zie meteen wat de build kost."
-              : "This page focuses purely on the computer itself. Pick CPU, GPU and RAM yourself, add extra hardware and see the build price update instantly."}
-          </p>
+          <p className="eyebrow">{copy.eyebrow}</p>
+          <h1 className="headline text-4xl sm:text-5xl lg:text-6xl">{copy.title}</h1>
+          <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">{copy.intro}</p>
           <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 text-sm leading-7 text-[color:var(--muted)]">
-            <p>{lang === "nl" ? pricingData.note : "Price data is continuously updated for our own configuration guidance."}</p>
-            {status === "loading" ? <p className="mt-2">{lang === "nl" ? "Prijsdata wordt bijgewerkt..." : "Updating price data..."}</p> : null}
+            <p><strong>{copy.noteTitle}:</strong> {copy.noteBody}</p>
+            {status === "loading" ? <p className="mt-2">{copy.loading}</p> : null}
             {status === "error" ? <p className="mt-2 text-[color:var(--accent)]">{errorMessage}</p> : null}
           </div>
         </div>
@@ -407,53 +311,61 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
       <section className="grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
         <aside className="panel space-y-6 p-6">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">{lang === "nl" ? "Filters" : "Filters"}</p>
-            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
-              {lang === "nl"
-                ? "Pas de builder aan op basis van gebruik, resolutie, opslag en budgetdoel."
-                : "Adjust the builder based on usage, resolution, storage and budget target."}
-            </p>
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">{copy.filtersTitle}</p>
+            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">{copy.filtersBody}</p>
           </div>
 
           <label className="block">
-            <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Jouw gebruiksprofiel" : "Your usage profile"}</span>
+            <span className="text-sm font-semibold text-[color:var(--foreground)]">{copy.usageLabel}</span>
             <select
               value={usageIntent}
               onChange={(event) => setUsageIntent(event.target.value as UsageIntent)}
               className="mt-3 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none"
             >
-              <option value="balanced">{lang === "nl" ? "Allround" : "Balanced"}</option>
-              <option value="daily">{lang === "nl" ? "Gewoon dagelijks gebruik" : "Everyday use"}</option>
-              <option value="student">{lang === "nl" ? "School en studie" : "School and study"}</option>
-              <option value="gaming">{lang === "nl" ? "Gaming" : "Gaming"}</option>
-              <option value="creator">{lang === "nl" ? "Creatie (foto/video)" : "Creative work (photo/video)"}</option>
-              <option value="future">{lang === "nl" ? "Toekomstgericht" : "Future-proof"}</option>
+              <option value="balanced">{copy.usage.balanced}</option>
+              <option value="daily">{copy.usage.daily}</option>
+              <option value="student">{copy.usage.student}</option>
+              <option value="gaming">{copy.usage.gaming}</option>
+              <option value="creator">{copy.usage.creator}</option>
+              <option value="future">{copy.usage.future}</option>
             </select>
           </label>
 
+          <label className="block">
+            <span className="text-sm font-semibold text-[color:var(--foreground)]">{copy.platformLabel}</span>
+            <select
+              value={platform}
+              onChange={(event) => setPlatform(event.target.value as BuildPlatform)}
+              className="mt-3 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none"
+            >
+              <option value="all">{copy.platformAll}</option>
+              <option value="amd">{copy.platformAmd}</option>
+              <option value="intel">{copy.platformIntel}</option>
+            </select>
+            <span className="mt-2 block text-xs leading-5 text-[color:var(--muted)]">{copy.platformHelp}</span>
+          </label>
+
           <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
-            <p className="font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Aanbevolen basis voor dit profiel" : "Recommended base for this profile"}</p>
-            <p className="mt-2">
-              {recommendedCpu?.label ?? "CPU"} / {recommendedGpu?.label ?? "GPU"} / {recommendedMemory?.label ?? "RAM"}
-            </p>
+            <p className="font-semibold text-[color:var(--foreground)]">{copy.profileTitle}</p>
+            <p className="mt-2">{recommendedProfileName}</p>
             <button
               type="button"
-              onClick={applyRecommendedBuild}
+              onClick={applyRecommendedProfile}
               className="mt-3 rounded-xl border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2 text-xs font-semibold text-[color:var(--foreground)] transition hover:border-[color:var(--accent)]"
             >
-              {lang === "nl" ? "Gebruik aanbevolen samenstelling" : "Use recommended setup"}
+              {copy.applyRecommendation}
             </button>
           </div>
 
           <div>
             <div className="flex items-center justify-between gap-4">
-              <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Maximaal budget" : "Maximum budget"}</span>
+              <span className="text-sm font-semibold text-[color:var(--foreground)]">{copy.budgetLabel}</span>
               <span className="text-sm font-semibold text-[color:var(--accent)]">{euro.format(budget)}</span>
             </div>
             <input
               type="range"
-              min={900}
-              max={2800}
+              min={1200}
+              max={4500}
               step={50}
               value={budget}
               onChange={(event) => setBudget(Number(event.target.value))}
@@ -461,75 +373,13 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
             />
           </div>
 
-          <label className="flex items-start gap-3 rounded-2xl border border-[color:var(--border)] px-4 py-3">
-            <input
-              type="checkbox"
-              checked={needsTwoTb}
-              onChange={(event) => setNeedsTwoTb(event.target.checked)}
-              className="mt-1 h-4 w-4 accent-[color:var(--accent)]"
-            />
-            <span>
-              <span className="block text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Minstens 2 TB opslag" : "At least 2 TB storage"}</span>
-              <span className="mt-1 block text-sm leading-6 text-[color:var(--muted)]">{lang === "nl" ? "Voegt automatisch de opslagupgrade toe in de berekening." : "Automatically adds the storage upgrade to the calculation."}</span>
-            </span>
-          </label>
-
-          <div className="space-y-4 rounded-2xl border border-[color:var(--border)] px-4 py-4">
-            <div>
-              <p className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Kernconfiguratie" : "Core configuration"}</p>
-              <p className="mt-1 text-sm leading-6 text-[color:var(--muted)]">
-                {lang === "nl"
-                  ? "Kies zelf CPU, GPU en RAM. De totaalprijs wordt daarop herberekend."
-                  : "Pick CPU, GPU and RAM yourself. The total price is recalculated from those choices."}
-              </p>
-            </div>
-
-            {[
-              { ...selectedCpuGroup, options: visibleCpuOptions },
-              { ...selectedGpuGroup, options: visibleGpuOptions },
-              { ...selectedMemoryGroup, options: visibleMemoryOptions },
-            ].map((group) => {
-              const selectedValue = group.id === "cpu" ? selectedCpu.id : group.id === "gpu" ? selectedGpu.id : selectedMemory.id;
-
-              return (
-                <label key={group.id} className="block">
-                  <span className="text-sm font-semibold text-[color:var(--foreground)]">{group.label}</span>
-                  <select
-                    value={selectedValue}
-                    onChange={(event) => {
-                      if (group.id === "cpu") {
-                        setSelectedCpuId(event.target.value);
-                      } else if (group.id === "gpu") {
-                        setSelectedGpuId(event.target.value);
-                      } else {
-                        setSelectedMemoryId(event.target.value);
-                      }
-                    }}
-                    className="mt-3 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none"
-                  >
-                    {group.options.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.label} - {euro.format(option.price)}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="mt-2 block text-xs leading-5 text-[color:var(--muted)]">{group.helper}</span>
-                </label>
-              );
-            })}
-          </div>
-
           <div>
-            <p className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Extra hardware" : "Extra hardware"}</p>
-            <p className="mt-1 text-xs leading-5 text-[color:var(--muted)]">
-              {lang === "nl"
-                ? "De getoonde upgrades zijn afgestemd op je gekozen gebruiksprofiel."
-                : "Shown upgrades are tailored to your selected usage profile."}
-            </p>
+            <p className="text-sm font-semibold text-[color:var(--foreground)]">{copy.extrasTitle}</p>
+            <p className="mt-1 text-xs leading-5 text-[color:var(--muted)]">{copy.extrasBody}</p>
             <div className="mt-3 space-y-3">
-              {visibleExtraOptions.map((option) => {
+              {pricingData.options.map((option) => {
                 const checked = selectedOptionIds.includes(option.id);
-                const isRecommended = recommendedExtras.includes(option.id);
+                const isRecommended = recommendedExtrasByIntent[usageIntent].includes(option.id);
 
                 return (
                   <label key={option.id} className="flex items-start gap-3 rounded-2xl border border-[color:var(--border)] px-4 py-3">
@@ -542,7 +392,7 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
                     <span>
                       <span className="block text-sm font-semibold text-[color:var(--foreground)]">
                         {option.label} ({euro.format(option.price)})
-                        {isRecommended ? ` · ${lang === "nl" ? "aanbevolen" : "recommended"}` : ""}
+                        {isRecommended ? ` · ${copy.recommended}` : ""}
                       </span>
                       <span className="mt-1 block text-sm leading-6 text-[color:var(--muted)]">{option.helper}</span>
                     </span>
@@ -554,12 +404,6 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
         </aside>
 
         <div className="space-y-6">
-          <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm leading-6 text-[color:var(--muted)]">
-            {lang === "nl"
-              ? "Tip: een klik op een configuratiekaart wisselt alleen het profiel. Je CPU, GPU, RAM en extra opties blijven behouden totdat je ze zelf wijzigt."
-              : "Tip: clicking a configuration card switches only the profile. Your CPU, GPU, RAM and extra options stay unchanged until you adjust them yourself."}
-          </div>
-
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredProfiles.map((profile) => {
               const total = profile.platformPrice + selectedComponentTotal + extrasTotal;
@@ -579,12 +423,7 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
                   <p className="text-sm font-semibold text-[color:var(--foreground)]">{profile.name}</p>
                   <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[color:var(--muted)]">{profile.audience}</p>
                   <p className="mt-4 text-2xl font-semibold text-[color:var(--foreground)]">{euro.format(total)}</p>
-                  <p className="mt-2 text-xs leading-5 text-[color:var(--muted)]">
-                    {lang === "nl" ? "Platformbasis" : "Platform base"}: {euro.format(profile.platformPrice)}
-                  </p>
-                  <p className="mt-2 text-xs leading-5 text-[color:var(--muted)]">
-                    {lang === "nl" ? "Klik selecteert alleen dit profiel." : "Click selects this profile only."}
-                  </p>
+                  <p className="mt-2 text-xs leading-5 text-[color:var(--muted)]">{copy.profileBase}: {euro.format(profile.platformPrice)}</p>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">{profile.description}</p>
                 </button>
               );
@@ -592,122 +431,131 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
           </div>
 
           {filteredProfiles.length === 0 ? (
-            <div className="panel p-6 text-sm leading-7 text-[color:var(--muted)]">
-              {lang === "nl" ? "Geen configuraties gevonden binnen deze filters. Verhoog je budget of zet een filter breder." : "No configurations found within these filters. Increase your budget or broaden a filter."}
-            </div>
+            <div className="panel p-6 text-sm leading-7 text-[color:var(--muted)]">{copy.noProfiles}</div>
           ) : null}
 
+          <section className="space-y-5">
+            {visibleGroups.map((group) => {
+              const selectedOptionId = resolvedComponentByGroup[group.id] ?? group.defaultOptionId;
+
+              return (
+                <div key={group.id} className="panel p-5">
+                  <div className="mb-4 flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[color:var(--accent)]">
+                        {lang === "nl" ? group.label : (groupLabelEn[group.id] ?? group.label)}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{group.helper}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {group.options.map((option) => {
+                      const isSelected = option.id === selectedOptionId;
+
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => setSelectedComponentByGroup((current) => ({ ...current, [group.id]: option.id }))}
+                          className={`overflow-hidden rounded-2xl border text-left transition ${
+                            isSelected
+                              ? "border-[color:var(--accent)] bg-[color:var(--surface)] shadow-[0_10px_24px_rgba(36,25,19,0.08)]"
+                              : "border-[color:var(--border)] bg-[color:rgba(255,248,240,0.72)] hover:border-[color:var(--accent)]/50"
+                          }`}
+                        >
+                          {option.imageUrl ? (
+                            <Image
+                              src={option.imageUrl}
+                              alt={option.imageAlt ?? option.label}
+                              width={720}
+                              height={320}
+                              className="h-28 w-full object-cover"
+                            />
+                          ) : null}
+                          <div className="space-y-2 p-4">
+                            <p className="text-sm font-semibold text-[color:var(--foreground)]">{option.label}</p>
+                            <p className="text-sm font-semibold text-[color:var(--accent)]">{euro.format(option.price)}</p>
+                            <p className="text-xs leading-5 text-[color:var(--muted)]">{option.helper}</p>
+                            {option.retailer && option.url ? (
+                              <a
+                                href={option.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex text-xs font-semibold text-[color:var(--accent)] underline underline-offset-4"
+                                onClick={(event) => event.stopPropagation()}
+                              >
+                                {copy.retailerLabel}: {option.retailer}
+                              </a>
+                            ) : null}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </section>
+
           {activeProfile ? (
-            <section className="panel-soft grid gap-6 p-6 lg:grid-cols-[0.92fr_1.08fr]">
+            <section className="panel-soft grid gap-6 p-6 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">{lang === "nl" ? "Gekozen build" : "Selected build"}</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[color:var(--accent)]">{copy.selectedBuild}</p>
                 <h2 className="mt-3 text-2xl font-semibold text-[color:var(--foreground)]">{activeProfile.name}</h2>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)]">
-                    {lang === "nl" ? "Actief profiel" : "Active profile"}: {activeProfile.name}
-                  </span>
-                </div>
                 <p className="mt-3 text-base leading-7 text-[color:var(--muted)]">{activeProfile.description}</p>
-
-                <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">CPU</p>
-                    <p className="mt-2 text-sm font-semibold text-[color:var(--foreground)]">{selectedCpu.label}</p>
-                    <p className="mt-1 text-xs text-[color:var(--muted)]">{euro.format(selectedCpu.price)}</p>
-                  </div>
-                  <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">GPU</p>
-                    <p className="mt-2 text-sm font-semibold text-[color:var(--foreground)]">{selectedGpu.label}</p>
-                    <p className="mt-1 text-xs text-[color:var(--muted)]">{euro.format(selectedGpu.price)}</p>
-                  </div>
-                  <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">RAM</p>
-                    <p className="mt-2 text-sm font-semibold text-[color:var(--foreground)]">{selectedMemory.label}</p>
-                    <p className="mt-1 text-xs text-[color:var(--muted)]">{euro.format(selectedMemory.price)}</p>
-                  </div>
-                </div>
-
-                <ul className="mt-5 space-y-2 text-sm leading-6 text-[color:var(--muted)]">
-                  {activeProfile.includes.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <span aria-hidden="true" className="text-[color:var(--accent)]">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                <button
+                  type="button"
+                  onClick={applyProfileDefaults}
+                  className="mt-4 rounded-xl border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2 text-xs font-semibold text-[color:var(--foreground)] transition hover:border-[color:var(--accent)]"
+                >
+                  {lang === "nl" ? "Gebruik standaard onderdelen van dit profiel" : "Use this profile defaults"}
+                </button>
               </div>
 
               <div className="space-y-4 rounded-[1.4rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-5">
                 <div className="flex items-start justify-between gap-4">
-                  <span className="text-sm text-[color:var(--muted)]">{lang === "nl" ? "Platformbasis" : "Platform base"}</span>
+                  <span className="text-sm text-[color:var(--muted)]">{copy.profileBase}</span>
                   <span className="text-sm font-semibold text-[color:var(--foreground)]">{euro.format(activeProfile.platformPrice)}</span>
                 </div>
                 <div className="flex items-start justify-between gap-4">
-                  <span className="text-sm text-[color:var(--muted)]">CPU / GPU / RAM</span>
+                  <span className="text-sm text-[color:var(--muted)]">{copy.selectedParts}</span>
                   <span className="text-sm font-semibold text-[color:var(--foreground)]">{euro.format(selectedComponentTotal)}</span>
                 </div>
                 <div className="flex items-start justify-between gap-4">
-                  <span className="text-sm text-[color:var(--muted)]">{lang === "nl" ? "Extra hardware" : "Extra hardware"}</span>
+                  <span className="text-sm text-[color:var(--muted)]">{copy.selectedExtras}</span>
                   <span className="text-sm font-semibold text-[color:var(--foreground)]">{euro.format(extrasTotal)}</span>
                 </div>
                 <div className="flex items-start justify-between gap-4 border-t border-[color:var(--border)] pt-4">
-                  <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Totaal" : "Total"}</span>
+                  <span className="text-sm font-semibold text-[color:var(--foreground)]">{copy.total}</span>
                   <span className="text-xl font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal)}</span>
                 </div>
                 <div className="rounded-2xl bg-[color:var(--accent-soft)]/70 px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
-                  {lang === "nl"
-                    ? <>Presetprijs met deze keuzes: <span className="font-semibold text-[color:var(--foreground)]">{euro.format(presetTotal)}</span>. Verschil met jouw custom build: <span className="font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal - presetTotal)}</span>.</>
-                    : <>Preset price with these choices: <span className="font-semibold text-[color:var(--foreground)]">{euro.format(presetTotal)}</span>. Difference versus your custom build: <span className="font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal - presetTotal)}</span>.</>}
+                  {copy.estimateNote}
                 </div>
-                <div className="rounded-2xl bg-[color:var(--accent-soft)]/70 px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
-                  {lang === "nl"
-                    ? "Deze prijs is een indicatie op basis van je gekozen onderdelen en profiel."
-                    : "This price is an estimate based on your selected parts and profile."}
+                <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
+                  <p className="font-semibold text-[color:var(--foreground)]">{copy.approvalTitle}</p>
+                  <label className="mt-2 flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={isPriceApproved}
+                      onChange={(event) => setIsPriceApproved(event.target.checked)}
+                      className="mt-1 h-4 w-4 accent-[color:var(--accent)]"
+                    />
+                    <span>{copy.approvalText}</span>
+                  </label>
                 </div>
-                <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4">
-                  <p className="text-sm font-semibold text-[color:var(--foreground)]">
-                    {lang === "nl" ? "Profielstandaard toepassen" : "Apply profile defaults"}
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
-                    {lang === "nl"
-                      ? "Wil je exact de standaardonderdelen van dit profiel? Pas ze bewust toe met deze knop."
-                      : "Want the exact default parts for this profile? Apply them deliberately with this button."}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={applyActiveProfileDefaults}
-                    className="mt-3 rounded-xl border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2 text-xs font-semibold text-[color:var(--foreground)] transition hover:border-[color:var(--accent)]"
-                  >
-                    {lang === "nl" ? "Gebruik profiel-standaard CPU/GPU/RAM" : "Use profile default CPU/GPU/RAM"}
-                  </button>
-                </div>
-                <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">
-                    {lang === "nl" ? "Stap 3 - bevestiging" : "Step 3 - confirmation"}
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
-                    {lang === "nl"
-                      ? "Vink akkoord aan om je gekozen configuratie en prijsindicatie door te sturen naar ons team."
-                      : "Tick approval to send your selected configuration and estimate to our team."}
-                  </p>
-                </div>
-                <label className="flex items-start gap-3 rounded-2xl border border-[color:var(--border)] px-4 py-3">
-                  <input
-                    type="checkbox"
-                    checked={isPriceApproved}
-                    onChange={(event) => setIsPriceApproved(event.target.checked)}
-                    className="mt-1 h-4 w-4 accent-[color:var(--accent)]"
-                  />
-                  <span className="text-sm leading-6 text-[color:var(--muted)]">
-                    {lang === "nl"
-                      ? "Ik ga akkoord met deze prijsindicatie en wil deze configuratie doorsturen voor finale controle en offerte op maat."
-                      : "I agree with this price estimate and want to submit this configuration for final review and a tailored quote."}
-                  </span>
-                </label>
-                <div className="rounded-2xl bg-[color:var(--accent-soft)]/70 px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
-                  {lang === "nl"
-                    ? "Na je aanvraag bekijken we de configuratie handmatig, passen indien nodig prijzen of onderdelen aan, en sturen je daarna een finale offerte."
-                    : "After your request, we review the configuration manually, adjust pricing or components if needed, and then send you a final quote."}
+                <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 text-sm leading-6 text-[color:var(--muted)]">
+                  <p className="font-semibold text-[color:var(--foreground)]">{copy.orderTitle}</p>
+                  <label className="mt-2 flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={wantsOrderAndPaymentLink}
+                      onChange={(event) => setWantsOrderAndPaymentLink(event.target.checked)}
+                      className="mt-1 h-4 w-4 accent-[color:var(--accent)]"
+                    />
+                    <span>{copy.orderText}</span>
+                  </label>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Link
@@ -715,10 +563,17 @@ export default function PcBuilderExperience({ lang }: PcBuilderExperienceProps) 
                     aria-disabled={!isPriceApproved}
                     className={`story-link inline-flex justify-center ${!isPriceApproved ? "pointer-events-none opacity-50 saturate-0" : ""}`}
                   >
-                    {lang === "nl" ? "Vraag offerte voor deze build" : "Request a quote for this build"}
+                    {copy.quoteAction}
+                  </Link>
+                  <Link
+                    href={quoteLink}
+                    aria-disabled={!isPriceApproved || !wantsOrderAndPaymentLink}
+                    className={`story-link inline-flex justify-center ${!isPriceApproved || !wantsOrderAndPaymentLink ? "pointer-events-none opacity-50 saturate-0" : ""}`}
+                  >
+                    {copy.orderAction}
                   </Link>
                   <Link href={buildLocalizedHref("/contact", lang === "nl" ? "" : "lang=en", lang)} className="story-link inline-flex justify-center">
-                    {lang === "nl" ? "Algemeen contact" : "General contact"}
+                    {copy.generalContact}
                   </Link>
                 </div>
               </div>
