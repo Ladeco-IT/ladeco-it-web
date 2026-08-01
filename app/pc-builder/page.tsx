@@ -7,11 +7,11 @@ import { defaultKeywords, siteName, socialImage } from "../seo";
 const pcBuilderCopy = {
   nl: {
     title: "PC Builder",
-    description: "Stel een voordelige pc samen op basis van je gebruik, budget en gewenste prestaties.",
+    description: "Geef je budget en gebruiksdoel door, en wij zoeken de beste pc-configuratie op maat.",
   },
   en: {
     title: "PC Builder",
-    description: "Build a cost-efficient PC based on your use case, budget and desired performance.",
+    description: "Share your budget and use case, and we find the best tailored PC configuration.",
   },
 };
 

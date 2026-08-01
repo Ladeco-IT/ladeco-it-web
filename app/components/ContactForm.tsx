@@ -23,17 +23,46 @@ export default function ContactForm({ lang }: ContactFormProps) {
   const pcComponentsLabel = searchParams.get("pcComponentsLabel") || "";
   const pcApproval = searchParams.get("pcApproval") || "";
   const pcOrderIntent = searchParams.get("pcOrderIntent") || "";
+  const pcMode = searchParams.get("pcMode") || "";
+  const pcSimpleBudget = searchParams.get("pcSimpleBudget") || "";
+  const pcSimpleUse = searchParams.get("pcSimpleUse") || "";
+  const pcSimpleNotes = searchParams.get("pcSimpleNotes") || "";
+  const isSimpleModeRequest = pcMode === "simple";
   const isOrderIntent = pcOrderIntent === "1";
   const success = searchParams.get("success") === "1";
   const [subjectValue, setSubjectValue] = useState(() =>
-    pcLabel
+    isSimpleModeRequest
+      ? lang === "nl"
+        ? "Aanvraag eenvoudige pc-configuratiehulp"
+        : "Simple PC configuration help request"
+      : pcLabel
       ? lang === "nl"
         ? (isOrderIntent ? "Bestelaanvraag pc-configuratie + betaallink" : "Offerteaanvraag pc-configuratie")
         : (isOrderIntent ? "PC order request + payment link" : "Quote request for PC configuration")
       : ""
   );
   const [messageValue, setMessageValue] = useState(() =>
-    pcLabel
+    isSimpleModeRequest
+      ? lang === "nl"
+        ? `Hallo,
+
+Ik wil graag eenvoudige hulp bij het samenstellen van een pc.
+- Richtbudget: € ${pcSimpleBudget || "onbekend"}
+- Gebruik: ${pcSimpleUse || "niet opgegeven"}
+- Extra wensen: ${pcSimpleNotes || "geen"}
+
+Mijn vragen of voorkeuren:
+`
+        : `Hello,
+
+I would like simple help with building a PC.
+- Target budget: € ${pcSimpleBudget || "unknown"}
+- Use case: ${pcSimpleUse || "not provided"}
+- Extra preferences: ${pcSimpleNotes || "none"}
+
+My questions or preferences:
+`
+      : pcLabel
       ? lang === "nl"
         ? `Hallo,
 
@@ -69,6 +98,9 @@ My questions or preferences:
         componentsLabel: "Componentkeuze",
         approvalLabel: "Akkoord op indicatie",
         orderIntentLabel: "Bestellen + betaallink",
+        simpleBudgetLabel: "Richtbudget",
+        simpleUseLabel: "Gebruik",
+        simpleNotesLabel: "Extra wensen",
         approvalYes: "Ja",
         approvalNo: "Nee",
         flowTitle: "Wat gebeurt er na je aanvraag?",
@@ -94,6 +126,9 @@ My questions or preferences:
         componentsLabel: "Component selection",
         approvalLabel: "Approved estimate",
         orderIntentLabel: "Order + payment link",
+        simpleBudgetLabel: "Target budget",
+        simpleUseLabel: "Use case",
+        simpleNotesLabel: "Extra preferences",
         approvalYes: "Yes",
         approvalNo: "No",
         flowTitle: "What happens after your request?",
@@ -172,6 +207,15 @@ My questions or preferences:
           </div>
         ) : null}
 
+        {isSimpleModeRequest ? (
+          <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 text-sm leading-6 text-[color:var(--muted)]">
+            <p className="font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Eenvoudige pc-configuratiehulp" : "Simple PC configuration help"}</p>
+            <p className="mt-2">{copy.simpleBudgetLabel}: € {pcSimpleBudget || (lang === "nl" ? "onbekend" : "unknown")}</p>
+            <p className="mt-1">{copy.simpleUseLabel}: {pcSimpleUse || (lang === "nl" ? "niet opgegeven" : "not provided")}</p>
+            <p className="mt-1">{copy.simpleNotesLabel}: {pcSimpleNotes || (lang === "nl" ? "geen" : "none")}</p>
+          </div>
+        ) : null}
+
         {pcLabel ? (
           <div className="rounded-2xl bg-[color:var(--accent-soft)]/70 p-4 text-sm leading-6 text-[color:var(--muted)]">
             <p className="font-semibold text-[color:var(--foreground)]">{copy.flowTitle}</p>
@@ -243,6 +287,10 @@ My questions or preferences:
         <input type="hidden" name="pcComponentsLabel" value={pcComponentsLabel} />
         <input type="hidden" name="pcApproval" value={pcApproval} />
         <input type="hidden" name="pcOrderIntent" value={pcOrderIntent} />
+        <input type="hidden" name="pcMode" value={pcMode} />
+        <input type="hidden" name="pcSimpleBudget" value={pcSimpleBudget} />
+        <input type="hidden" name="pcSimpleUse" value={pcSimpleUse} />
+        <input type="hidden" name="pcSimpleNotes" value={pcSimpleNotes} />
         <button
           type="submit"
           disabled={isSubmitting}

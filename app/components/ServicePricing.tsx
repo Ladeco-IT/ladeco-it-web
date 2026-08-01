@@ -16,15 +16,21 @@ export default function ServicePricing({ lang }: ServicePricingProps) {
     ? {
         eyebrow: "Serviceprijzen",
         title: "Duidelijke tarieven voor het werk dat we leveren.",
-        intro:
-          "Dit zijn onze richtprijzen voor de meest gevraagde diensten. Voor grotere opdrachten of combinaties maken we een gerichte offerte op maat.",
+        intro: "Prijzen zijn standaard prijzen en kunnen afwijken.",
+        noticeTitle: "Belangrijk",
+        noticeText: "Prijzen zijn standaard prijzen (kan afwijken).",
+        otherRequestTitle: "Aanvraag voor andere IT zaken",
+        otherRequestText: "Ook voor andere IT-vragen kan je contact opnemen. We maken dan een voorstel op maat.",
         services: serviceRates,
       }
     : {
         eyebrow: "Service pricing",
         title: "Clear rates for the work we deliver.",
-        intro:
-          "These are our reference prices for the most requested services. For larger jobs or combinations, we prepare a tailored quote.",
+        intro: "Prices are standard reference prices and may vary.",
+        noticeTitle: "Important",
+        noticeText: "Prices are standard prices (may vary).",
+        otherRequestTitle: "Request for other IT services",
+        otherRequestText: "You can also contact us for other IT needs. We will prepare a tailored proposal.",
         services: serviceRates.map((service) => {
           if (service.title === "Diagnose en foutanalyse") {
             return {
@@ -63,14 +69,22 @@ export default function ServicePricing({ lang }: ServicePricingProps) {
               ...service,
               title: "On-site network intervention",
               unit: "/ hour",
-              description: "For Wi-Fi issues, router installs and small network improvements.",
+              description: "For Wi-Fi issues, router installs and small and/or large network improvements.",
+            };
+          }
+
+          if (service.title === "Computeronderhoud") {
+            return {
+              ...service,
+              title: "Computer maintenance",
+              description: "Dust cleaning, updates, health check and performance review.",
             };
           }
 
           return {
             ...service,
-            title: "Semi-annual maintenance",
-            description: "Dust cleaning, updates, health check and performance review.",
+            title: service.title,
+            description: service.description,
           };
         }),
       };
@@ -83,6 +97,9 @@ export default function ServicePricing({ lang }: ServicePricingProps) {
         <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
           {copy.intro}
         </p>
+        <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 text-sm leading-7 text-[color:var(--muted)]">
+          <p><strong>{copy.noticeTitle}:</strong> {copy.noticeText}</p>
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -103,6 +120,11 @@ export default function ServicePricing({ lang }: ServicePricingProps) {
             </div>
           </article>
         ))}
+      </div>
+
+      <div className="rounded-[1.35rem] border border-dashed border-[color:var(--border)] bg-[color:var(--surface)] p-5">
+        <h3 className="text-base font-semibold text-[color:var(--foreground)]">{copy.otherRequestTitle}</h3>
+        <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{copy.otherRequestText}</p>
       </div>
     </section>
   );
