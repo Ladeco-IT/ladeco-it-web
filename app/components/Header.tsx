@@ -46,7 +46,6 @@ export default function Header({ lang, searchParams }: HeaderProps) {
                 />
               </div>
               <div className="min-w-0">
-                <p className="text-[0.7rem] uppercase tracking-[0.3em] text-[color:var(--accent)]">Ladeco IT</p>
                 <p className="text-sm font-medium text-[color:var(--foreground)]">
                   {lang === "nl" ? "Computers, software & netwerkservice" : "Computers, software & network services"}
                 </p>
