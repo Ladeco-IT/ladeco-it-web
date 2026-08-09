@@ -48,23 +48,23 @@ export default async function ContactPage({ searchParams }: { searchParams?: Pro
   const lang = resolveLang(resolvedSearchParams?.lang);
   const copy = lang === "nl"
     ? {
-        eyebrow: "Contact",
-        title: "Neem contact op voor een passend advies.",
-        intro:
-          "Heb je een vraag over onze diensten of wil je een afspraak maken? Vul het formulier in en we nemen snel contact met je op.",
-        direct: "Direct contact",
-        directText:
-          "Je kunt ons telefonisch bereiken of het formulier invullen. We geven een eerlijk advies en zorgen dat je weet wat je kunt verwachten.",
-      }
+      eyebrow: "Contact",
+      title: "Neem contact op voor een passend advies.",
+      intro:
+        "Heb je een vraag over onze diensten of wil je een afspraak maken? Vul het formulier in en we nemen snel contact met je op.",
+      direct: "Direct contact",
+      directText:
+        "Je kunt ons telefonisch bereiken of het formulier invullen. We geven een eerlijk advies en zorgen dat je weet wat je kunt verwachten.",
+    }
     : {
-        eyebrow: "Contact",
-        title: "Get in touch for tailored advice.",
-        intro:
-          "Have a question about our services or want to schedule a meeting? Fill out the form and we will get back to you quickly.",
-        direct: "Direct contact",
-        directText:
-          "You can reach us by phone or use the form. We give honest advice and make sure you know what to expect.",
-      };
+      eyebrow: "Contact",
+      title: "Get in touch for tailored advice.",
+      intro:
+        "Have a question about our services or want to schedule a meeting? Fill out the form and we will get back to you quickly.",
+      direct: "Direct contact",
+      directText:
+        "You can reach us by phone or use the form. We give honest advice and make sure you know what to expect.",
+    };
 
 
   return (
@@ -88,6 +88,7 @@ export default async function ContactPage({ searchParams }: { searchParams?: Pro
           <div className="space-y-2 text-sm">
             <p>{lang === "nl" ? "Telefoon" : "Phone"}: +32 478 22 86 26</p>
             <p>E-mail: info@ladeco-it.com</p>
+            <p> Service: 7/7</p>
           </div>
         </div>
       </section>
