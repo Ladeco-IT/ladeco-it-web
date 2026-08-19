@@ -160,7 +160,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               alt={copy.sections[0].imageAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
-              loading="lazy"
+              loading="eager"
+              priority
               className="object-cover"
             />
           </div>
