@@ -91,8 +91,8 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
           },
           {
             name: "Bultynck Alexander",
-            role: "Programmeur",
-            text: "Alexander ontwikkelt en verbetert softwareoplossingen, automatiseert processen en ondersteunt technische projecten van concept tot uitvoering.",
+            role: "Support en projectopvolging",
+            text: "Alexander zorgt voor vlotte communicatie, support en een correcte opvolging tijdens en na de uitvoering.",
             image: "/team/alexander-20260801.jpg",
             imageAlt: "Profielfoto van Bultynck Alexander",
           },
@@ -144,8 +144,8 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
           },
           {
             name: "Bultynck Alexander",
-            role: "Programmer",
-            text: "Alexander develops and improves software solutions, automates workflows and supports technical projects from concept to delivery.",
+            role: "Support and project follow-up",
+            text: "Alexander keeps communication smooth, handles support and ensures proper follow-up during and after delivery.",
             image: "/team/alexander-20260801.jpg",
             imageAlt: "Profile photo of Bultynck Alexander",
           },
