@@ -108,12 +108,12 @@ export default function ServicePricing({ lang }: ServicePricingProps) {
             key={service.title}
             className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-5"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <div>
                 <h3 className="text-base font-semibold text-[color:var(--foreground)]">{service.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{service.description}</p>
               </div>
-              <p className="whitespace-nowrap text-base font-semibold text-[color:var(--foreground)]">
+              <p className="text-base font-semibold text-[color:var(--foreground)] sm:whitespace-nowrap">
                 {euro.format(service.price)}
                 {service.unit ? service.unit : ""}
               </p>

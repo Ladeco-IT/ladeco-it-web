@@ -43,9 +43,9 @@ export default function Header({ lang, searchParams }: HeaderProps) {
     >
       <div className="px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5">
         <header className="w-full rounded-none border-0 bg-transparent px-0 py-0">
-          <div className="relative flex items-center gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
-            <Link href={buildLocalizedHref("/", searchParams, lang)} className="flex items-center gap-3 sm:justify-self-start">
-              <div className="relative h-12 w-12 overflow-hidden bg-transparent p-0 sm:h-14 sm:w-14">
+          <div className="relative flex min-w-0 items-center gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
+            <Link href={buildLocalizedHref("/", searchParams, lang)} className="flex min-w-0 flex-1 items-center gap-2 sm:justify-self-start sm:gap-3">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden bg-transparent p-0 sm:h-14 sm:w-14">
                 <Image
                   src="/logo.png"
                   alt="Ladeco IT logo"
@@ -56,7 +56,7 @@ export default function Header({ lang, searchParams }: HeaderProps) {
                 />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-[color:var(--foreground)]">
+                <p className="text-xs font-medium leading-5 text-[color:var(--foreground)] sm:text-sm">
                   {lang === "nl" ? "Computers, software & netwerkservice" : "Computers, software & network services"}
                 </p>
               </div>
@@ -98,7 +98,7 @@ export default function Header({ lang, searchParams }: HeaderProps) {
               </label>
             </div>
 
-            <div className="ml-auto flex items-center gap-2 sm:hidden">
+            <div className="ml-auto flex shrink-0 items-center gap-2 sm:hidden">
               <button
                 type="button"
                 className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:bg-[color:var(--accent-soft)]"

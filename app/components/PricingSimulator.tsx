@@ -130,12 +130,12 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
             </div>
 
             <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-5">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div>
                   <h3 className="text-lg font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Huidige simulatie" : "Current simulation"}</h3>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{selectedProfile.name}</p>
                 </div>
-                <p className="text-2xl font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal)}</p>
+                <p className="text-2xl font-semibold text-[color:var(--foreground)] sm:text-right">{euro.format(currentTotal)}</p>
               </div>
 
               <div className="mt-5 space-y-4">
@@ -166,7 +166,7 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
                     <span className="text-[color:var(--muted)]">{lang === "nl" ? "Geselecteerde extra&apos;s" : "Selected extras"}</span>
                     <span className="font-semibold text-[color:var(--foreground)]">{euro.format(extrasTotal)}</span>
                   </div>
-                  <div className="mt-4 flex items-start justify-between gap-4 border-t border-[color:var(--border)] pt-4">
+                  <div className="mt-4 flex flex-col gap-1 border-t border-[color:var(--border)] pt-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                     <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Geschatte totaalprijs" : "Estimated total price"}</span>
                     <span className="text-lg font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal)}</span>
                   </div>
