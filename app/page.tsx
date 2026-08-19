@@ -115,7 +115,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
 
   return (
     <main className="space-y-16">
-      <section className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div className="space-y-6">
           <p className="eyebrow">{copy.eyebrow}</p>
           <h1 className="headline text-4xl sm:text-5xl lg:text-6xl">
@@ -147,10 +148,12 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             />
           </div>
         </div>
-      </section>
+        </section>
+      </RevealOnScroll>
 
-      <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
-        <RevealOnScroll className="relative max-h-[320px] overflow-hidden rounded-md">
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <div className="relative max-h-[320px] overflow-hidden rounded-md">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[0].image}
@@ -161,9 +164,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               className="object-cover"
             />
           </div>
-        </RevealOnScroll>
+          </div>
 
-        <div className="space-y-5">
+          <div className="space-y-5">
           <p className="eyebrow">{copy.sections[0].eyebrow}</p>
           <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">
             {copy.sections[0].title}
@@ -171,11 +174,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
             {copy.sections[0].text}
           </p>
-        </div>
-      </section>
+          </div>
+        </section>
+      </RevealOnScroll>
 
-      <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <div className="space-y-5">
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="space-y-5">
           <p className="eyebrow">{copy.sections[1].eyebrow}</p>
           <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">
             {copy.sections[1].title}
@@ -183,9 +188,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
             {copy.sections[1].text}
           </p>
-        </div>
+          </div>
 
-        <RevealOnScroll className="relative max-h-[320px] overflow-hidden rounded-md">
+          <div className="relative max-h-[320px] overflow-hidden rounded-md">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[1].image}
@@ -196,11 +201,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               className="object-cover"
             />
           </div>
-        </RevealOnScroll>
-      </section>
+          </div>
+        </section>
+      </RevealOnScroll>
 
-      <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
-        <RevealOnScroll className="relative max-h-[320px] overflow-hidden rounded-md">
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <div className="relative max-h-[320px] overflow-hidden rounded-md">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[2].image}
@@ -211,9 +218,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               className="object-cover"
             />
           </div>
-        </RevealOnScroll>
+          </div>
 
-        <div className="space-y-5">
+          <div className="space-y-5">
           <p className="eyebrow">{copy.sections[2].eyebrow}</p>
           <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">
             {copy.sections[2].title}
@@ -221,11 +228,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
             {copy.sections[2].text}
           </p>
-        </div>
-      </section>
+          </div>
+        </section>
+      </RevealOnScroll>
 
-      <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <div className="space-y-5">
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="space-y-5">
           <p className="eyebrow">{copy.sections[3].eyebrow}</p>
           <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">
             {copy.sections[3].title}
@@ -233,9 +242,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
             {copy.sections[3].text}
           </p>
-        </div>
+          </div>
 
-        <RevealOnScroll className="relative max-h-[320px] overflow-hidden rounded-md">
+          <div className="relative max-h-[320px] overflow-hidden rounded-md">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[3].image}
@@ -246,8 +255,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               className="object-cover"
             />
           </div>
-        </RevealOnScroll>
-      </section>
+          </div>
+        </section>
+      </RevealOnScroll>
     </main>
   );
 }

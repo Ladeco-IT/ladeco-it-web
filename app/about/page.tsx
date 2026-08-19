@@ -157,7 +157,8 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
 
   return (
     <main className="space-y-14">
-      <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+      <RevealOnScroll>
+        <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
         <div className="space-y-4">
           <p className="eyebrow">{copy.eyebrow}</p>
           <h1 className="headline text-4xl sm:text-5xl lg:text-6xl">
@@ -172,10 +173,12 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
           <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">{copy.companyTitle}</p>
           <p className="text-base leading-7">{copy.companyText}</p>
         </div>
-      </section>
+        </section>
+      </RevealOnScroll>
 
-      <section className="panel-soft p-6 sm:p-8">
-        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+      <RevealOnScroll>
+        <section className="panel-soft p-6 sm:p-8">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">{copy.valuesTitle}</p>
           </div>
@@ -187,10 +190,12 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
               </div>
             ))}
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      </RevealOnScroll>
 
-      <section className="space-y-6">
+      <RevealOnScroll>
+        <section className="space-y-6">
         <div className="space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">{copy.teamTitle}</p>
           <p className="max-w-3xl text-base leading-8 text-[color:var(--muted)] sm:text-lg">{copy.teamIntro}</p>
@@ -200,7 +205,7 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
           {copy.team.map((member) => (
             <article key={member.name} className="panel space-y-3 p-5">
               <div className="flex items-center gap-4">
-                <RevealOnScroll className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-[color:var(--accent)]/55 bg-[color:var(--accent-soft)] ring-2 ring-[color:var(--border)]">
+                <div className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-[color:var(--accent)]/55 bg-[color:var(--accent-soft)] ring-2 ring-[color:var(--border)]">
                   <Image
                     src={member.image}
                     alt={member.imageAlt}
@@ -209,7 +214,7 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
                     loading="lazy"
                     className="object-cover"
                   />
-                </RevealOnScroll>
+                </div>
                 <p className="text-xl font-semibold text-[color:var(--foreground)]">{member.name}</p>
               </div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--accent)]">{member.role}</p>
@@ -217,14 +222,17 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
             </article>
           ))}
         </div>
-      </section>
+        </section>
+      </RevealOnScroll>
 
-      <section className="panel-soft p-6 sm:p-8">
+      <RevealOnScroll>
+        <section className="panel-soft p-6 sm:p-8">
         <div className="max-w-3xl space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">{copy.finalTitle}</p>
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">{copy.finalText}</p>
         </div>
-      </section>
+        </section>
+      </RevealOnScroll>
 
     </main>
   );
