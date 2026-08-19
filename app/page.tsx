@@ -65,6 +65,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             imageAlt: "IT-werkplek met netwerkapparatuur",
             image: "/basis_foto.png",
           },
+          {
+            eyebrow: "Herstelling van computer onderdelen",
+            title: "Snelle en betrouwbare reparaties.",
+            text: "We herstellen defecte computeronderdelen zodat je snel weer aan de slag kunt.",
+            imageAlt: "Reparatie van computeronderdelen",
+            image: "/computer_reparatie.png",
+          }
         ],
       }
     : {
@@ -96,6 +103,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             imageAlt: "IT workspace with network equipment",
             image: "/basis_foto.png",
           },
+          {
+            eyebrow: "Repair",
+            title: "Fast and reliable repairs.",
+            text: "We repair faulty computer components so you can get back to work quickly.",
+            imageAlt: "Repair of computer components",
+            image: "/computer_reparatie.png",
+          }
         ],
       };
 
@@ -208,6 +222,31 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             {copy.sections[2].text}
           </p>
         </div>
+      </section>
+
+      <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+        <div className="space-y-5">
+          <p className="eyebrow">{copy.sections[3].eyebrow}</p>
+          <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">
+            {copy.sections[3].title}
+          </h2>
+          <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
+            {copy.sections[3].text}
+          </p>
+        </div>
+
+        <RevealOnScroll className="relative max-h-[320px] overflow-hidden rounded-md">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
+            <Image
+              src={copy.sections[3].image}
+              alt={copy.sections[3].imageAlt}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="lazy"
+              className="object-cover"
+            />
+          </div>
+        </RevealOnScroll>
       </section>
     </main>
   );
