@@ -12,7 +12,7 @@ export default function Footer({ lang }: FooterProps) {
           <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--accent)]">Ladeco IT</p>
           <p className="font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Praktische IT, eerlijk en dichtbij." : "Practical IT, honest and close by."}</p>
         </div>
-        <div className="space-y-1 text-right">
+        <div className="space-y-1 text-left sm:text-right">
           <p>{lang === "nl" ? "BTW-nummer" : "VAT number"}: 1038.797.150</p>
           <p>© {new Date().getFullYear()} Ladeco IT. {lang === "nl" ? "Alle rechten voorbehouden." : "All rights reserved."}</p>
         </div>

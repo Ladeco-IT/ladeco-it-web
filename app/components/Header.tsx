@@ -30,12 +30,22 @@ export default function Header({ lang, searchParams }: HeaderProps) {
   }
 
   return (
-    <div className="w-full border-b border-[color:var(--border)]/70 bg-[color:var(--surface)]/95 shadow-[0_10px_30px_rgba(36,25,19,0.04)] backdrop-blur">
+    <div
+      className="header-shell w-full border-b border-[color:var(--border)]/70 bg-[color:var(--surface)]/95 shadow-[0_10px_30px_rgba(36,25,19,0.04)] backdrop-blur"
+      style={{
+        "--surface": "#fcf8f2",
+        "--foreground": "#241913",
+        "--muted": "#6f5b4e",
+        "--border": "#d7c1a8",
+        "--accent": "#9a5b2f",
+        "--accent-soft": "#f4e3d0",
+      } as React.CSSProperties}
+    >
       <div className="px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5">
         <header className="w-full rounded-none border-0 bg-transparent px-0 py-0">
-          <div className="relative flex items-center gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
-            <Link href={buildLocalizedHref("/", searchParams, lang)} className="flex items-center gap-3 sm:justify-self-start">
-              <div className="relative h-12 w-12 overflow-hidden bg-transparent p-0 sm:h-14 sm:w-14">
+          <div className="relative flex min-w-0 items-center gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
+            <Link href={buildLocalizedHref("/", searchParams, lang)} className="flex min-w-0 flex-1 items-center gap-2 sm:justify-self-start sm:gap-3">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden bg-transparent p-0 sm:h-14 sm:w-14">
                 <Image
                   src="/logo.png"
                   alt="Ladeco IT logo"
@@ -46,7 +56,7 @@ export default function Header({ lang, searchParams }: HeaderProps) {
                 />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-[color:var(--foreground)]">
+                <p className="text-xs font-medium leading-5 text-[color:var(--foreground)] sm:text-sm">
                   {lang === "nl" ? "Computers, software & netwerkservice" : "Computers, software & network services"}
                 </p>
               </div>
@@ -88,34 +98,29 @@ export default function Header({ lang, searchParams }: HeaderProps) {
               </label>
             </div>
 
-            <div className="ml-auto flex items-center gap-2 sm:hidden">
+            <div className="ml-auto flex shrink-0 items-center gap-2 sm:hidden">
               <button
                 type="button"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:bg-[color:var(--accent-soft)]"
+                className="group inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:bg-[color:var(--accent-soft)]"
                 aria-expanded={isOpen}
                 aria-controls="mobile-navigation"
                 onClick={() => setIsOpen((current) => !current)}
               >
                 <span className="sr-only">{lang === "nl" ? `Menu ${isOpen ? "sluiten" : "openen"}` : `Menu ${isOpen ? "close" : "open"}`}</span>
-                {isOpen ? (
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 6 6 18" />
-                    <path d="m6 6 12 12" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 7h16" />
-                    <path d="M4 12h16" />
-                    <path d="M4 17h16" />
-                  </svg>
-                )}
+                <span className="relative flex h-6 w-6 items-center justify-center" aria-hidden="true">
+                  <span className={`absolute h-0.5 w-5 rounded-full bg-current transition-transform duration-300 ease-in-out ${isOpen ? "rotate-45" : "-translate-y-2"}`} />
+                  <span className={`absolute h-0.5 w-5 rounded-full bg-current transition-opacity duration-200 ease-in-out ${isOpen ? "opacity-0" : "opacity-100"}`} />
+                  <span className={`absolute h-0.5 w-5 rounded-full bg-current transition-transform duration-300 ease-in-out ${isOpen ? "-rotate-45" : "translate-y-2"}`} />
+                </span>
               </button>
             </div>
           </div>
 
           <nav
             id="mobile-navigation"
-            className={`mt-4 flex flex-col gap-2 text-sm sm:hidden ${isOpen ? "block" : "hidden"}`}
+            aria-hidden={!isOpen}
+            inert={!isOpen}
+            className={`mt-4 flex flex-col gap-2 overflow-hidden text-sm transition-[max-height,opacity,transform] duration-300 ease-in-out sm:hidden ${isOpen ? "max-h-[32rem] opacity-100" : "pointer-events-none max-h-0 -translate-y-2 opacity-0"}`}
           >
             <label className="relative mb-2 block">
               <span className="sr-only">{lang === "nl" ? "Selecteer taal" : "Select language"}</span>

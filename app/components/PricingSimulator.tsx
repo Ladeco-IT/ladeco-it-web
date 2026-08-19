@@ -78,8 +78,8 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
                   onClick={() => setSelectedProfileId(profile.id)}
                   className={`rounded-[1.5rem] border p-5 text-left transition ${
                     isSelected
-                      ? "border-[color:var(--accent)] bg-[color:var(--surface)] shadow-[0_18px_40px_rgba(36,25,19,0.08)]"
-                      : "border-[color:var(--border)] bg-[color:rgba(255,248,240,0.78)] hover:border-[color:var(--accent)]/50"
+                      ? "border-[color:var(--accent)] bg-[color:var(--surface)] shadow-[0_18px_40px_rgba(47,41,36,0.08)]"
+                      : "border-[color:var(--border)] bg-[color:rgba(255,253,250,0.78)] hover:border-[color:var(--accent)]/50"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -130,12 +130,12 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
             </div>
 
             <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-5">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div>
                   <h3 className="text-lg font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Huidige simulatie" : "Current simulation"}</h3>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{selectedProfile.name}</p>
                 </div>
-                <p className="text-2xl font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal)}</p>
+                <p className="text-2xl font-semibold text-[color:var(--foreground)] sm:text-right">{euro.format(currentTotal)}</p>
               </div>
 
               <div className="mt-5 space-y-4">
@@ -166,7 +166,7 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
                     <span className="text-[color:var(--muted)]">{lang === "nl" ? "Geselecteerde extra&apos;s" : "Selected extras"}</span>
                     <span className="font-semibold text-[color:var(--foreground)]">{euro.format(extrasTotal)}</span>
                   </div>
-                  <div className="mt-4 flex items-start justify-between gap-4 border-t border-[color:var(--border)] pt-4">
+                  <div className="mt-4 flex flex-col gap-1 border-t border-[color:var(--border)] pt-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                     <span className="text-sm font-semibold text-[color:var(--foreground)]">{lang === "nl" ? "Geschatte totaalprijs" : "Estimated total price"}</span>
                     <span className="text-lg font-semibold text-[color:var(--foreground)]">{euro.format(currentTotal)}</span>
                   </div>
@@ -175,7 +175,7 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:rgba(255,248,240,0.72)] p-5 text-sm leading-7 text-[color:var(--muted)]">
+          <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:rgba(255,253,250,0.72)] p-5 text-sm leading-7 text-[color:var(--muted)]">
             <p>{lang === "nl" ? `Laatst bijgewerkt: ${new Date(pricingData.fetchedAt).toLocaleString("nl-BE")}` : `Last updated: ${new Date(pricingData.fetchedAt).toLocaleString("en-GB")}`}</p>
             <p className="mt-3">{lang === "nl" ? "Bij een aanvraag valideren we je configuratie opnieuw en sturen we een finale offerte op maat." : "When you request a quote, we validate your configuration again and send a final tailored quote."}</p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">

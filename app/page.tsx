@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { buildLocalizedHref, resolveLang } from "./lib/i18n";
 import { defaultKeywords, siteDescription, siteName, socialImage } from "./seo";
+import RevealOnScroll from "./components/RevealOnScroll";
 
 export const metadata: Metadata = {
   title: siteName,
@@ -48,22 +49,29 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             title: "Sterke machines, zorgvuldig samengesteld.",
             text: "We bouwen computers met onderdelen die passen bij jouw werk, hobby of dagelijks gebruik.",
             imageAlt: "Computerassemblage in progress",
-            image: "/computer_maken.png",
+            image: "/assemblage.png",
           },
           {
             eyebrow: "Software",
             title: "Duidelijke tools voor echte situaties.",
             text: "Van slimme automatisering tot praktische oplossingen die echt helpen op het werk.",
             imageAlt: "Softwareontwikkeling op een laptop",
-            image: "/software_maken.png",
+            image: "/software.png",
           },
           {
             eyebrow: "Netwerk",
             title: "Stabiele verbindingen, weinig gedoe.",
             text: "We zorgen voor een netwerk dat betrouwbaar is, ook als alles tegelijk gebruikt wordt.",
             imageAlt: "IT-werkplek met netwerkapparatuur",
-            image: "/basis_foto.png",
+            image: "/netwerk.png",
           },
+          {
+            eyebrow: "Herstelling van computer onderdelen",
+            title: "Snelle en betrouwbare reparaties.",
+            text: "We herstellen defecte computeronderdelen zodat je snel weer aan de slag kunt.",
+            imageAlt: "Reparatie van computeronderdelen",
+            image: "/computer_reparatie.png",
+          }
         ],
       }
     : {
@@ -95,12 +103,20 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             imageAlt: "IT workspace with network equipment",
             image: "/basis_foto.png",
           },
+          {
+            eyebrow: "Repair",
+            title: "Fast and reliable repairs.",
+            text: "We repair faulty computer components so you can get back to work quickly.",
+            imageAlt: "Repair of computer components",
+            image: "/computer_reparatie.png",
+          }
         ],
       };
 
   return (
     <main className="space-y-16">
-      <section className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div className="space-y-6">
           <p className="eyebrow">{copy.eyebrow}</p>
           <h1 className="headline text-4xl sm:text-5xl lg:text-6xl">
@@ -120,7 +136,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           </div>
         </div>
 
-        <div className="relative h-[320px] w-full overflow-hidden rounded-md">
+        <div className="relative h-[180px] w-full overflow-hidden rounded-md sm:h-[240px] lg:h-[320px]">
           <div className="relative h-full w-full overflow-hidden rounded-md">
             <Image
               src="/logo.png"
@@ -132,22 +148,27 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             />
           </div>
         </div>
-      </section>
+        </section>
+      </RevealOnScroll>
 
-      <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
-        <div className="relative max-h-[320px] overflow-hidden rounded-md">
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <div className="order-2 relative max-h-[320px] overflow-hidden rounded-md lg:order-1">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[0].image}
               alt={copy.sections[0].imageAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="eager"
+              priority
+                unoptimized
               className="object-cover"
             />
           </div>
-        </div>
+          </div>
 
-        <div className="space-y-5">
+          <div className="order-1 space-y-5 lg:order-2">
           <p className="eyebrow">{copy.sections[0].eyebrow}</p>
           <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">
             {copy.sections[0].title}
@@ -155,11 +176,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
             {copy.sections[0].text}
           </p>
-        </div>
-      </section>
+          </div>
+        </section>
+      </RevealOnScroll>
 
-      <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <div className="space-y-5">
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="space-y-5">
           <p className="eyebrow">{copy.sections[1].eyebrow}</p>
           <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">
             {copy.sections[1].title}
@@ -167,35 +190,40 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
             {copy.sections[1].text}
           </p>
-        </div>
+          </div>
 
-        <div className="relative max-h-[320px] overflow-hidden rounded-md">
+          <div className="order-2 relative max-h-[320px] overflow-hidden rounded-md lg:order-1">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[1].image}
               alt={copy.sections[1].imageAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
+                loading="eager"
+                unoptimized
               className="object-cover"
             />
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      </RevealOnScroll>
 
-      <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
-        <div className="relative max-h-[320px] overflow-hidden rounded-md">
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <div className="order-2 relative max-h-[320px] overflow-hidden rounded-md lg:order-1">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[2].image}
               alt={copy.sections[2].imageAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="lazy"
               className="object-cover"
             />
           </div>
-        </div>
+          </div>
 
-        <div className="space-y-5">
+          <div className="order-1 space-y-5 lg:order-2">
           <p className="eyebrow">{copy.sections[2].eyebrow}</p>
           <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">
             {copy.sections[2].title}
@@ -203,8 +231,36 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
             {copy.sections[2].text}
           </p>
-        </div>
-      </section>
+          </div>
+        </section>
+      </RevealOnScroll>
+
+      <RevealOnScroll>
+        <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="space-y-5">
+          <p className="eyebrow">{copy.sections[3].eyebrow}</p>
+          <h2 className="text-3xl font-semibold text-[color:var(--foreground)]">
+            {copy.sections[3].title}
+          </h2>
+          <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">
+            {copy.sections[3].text}
+          </p>
+          </div>
+
+          <div className="relative max-h-[320px] overflow-hidden rounded-md">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
+            <Image
+              src={copy.sections[3].image}
+              alt={copy.sections[3].imageAlt}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="lazy"
+              className="object-cover"
+            />
+          </div>
+          </div>
+        </section>
+      </RevealOnScroll>
     </main>
   );
 }

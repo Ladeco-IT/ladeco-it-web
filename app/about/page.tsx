@@ -3,6 +3,7 @@ import Image from "next/image";
 
 import { resolveLang } from "../lib/i18n";
 import { defaultKeywords, siteName, socialImage } from "../seo";
+import RevealOnScroll from "../components/RevealOnScroll";
 
 const aboutCopy = {
   nl: {
@@ -156,7 +157,8 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
 
   return (
     <main className="space-y-14">
-      <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+      <RevealOnScroll>
+        <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
         <div className="space-y-4">
           <p className="eyebrow">{copy.eyebrow}</p>
           <h1 className="headline text-4xl sm:text-5xl lg:text-6xl">
@@ -171,10 +173,12 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
           <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">{copy.companyTitle}</p>
           <p className="text-base leading-7">{copy.companyText}</p>
         </div>
-      </section>
+        </section>
+      </RevealOnScroll>
 
-      <section className="panel-soft p-6 sm:p-8">
-        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+      <RevealOnScroll>
+        <section className="panel-soft p-6 sm:p-8">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">{copy.valuesTitle}</p>
           </div>
@@ -186,10 +190,12 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
               </div>
             ))}
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      </RevealOnScroll>
 
-      <section className="space-y-6">
+      <RevealOnScroll>
+        <section className="space-y-6">
         <div className="space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">{copy.teamTitle}</p>
           <p className="max-w-3xl text-base leading-8 text-[color:var(--muted)] sm:text-lg">{copy.teamIntro}</p>
@@ -205,6 +211,7 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
                     alt={member.imageAlt}
                     fill
                     sizes="64px"
+                    loading="lazy"
                     className="object-cover"
                   />
                 </div>
@@ -215,14 +222,17 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
             </article>
           ))}
         </div>
-      </section>
+        </section>
+      </RevealOnScroll>
 
-      <section className="panel-soft p-6 sm:p-8">
+      <RevealOnScroll>
+        <section className="panel-soft p-6 sm:p-8">
         <div className="max-w-3xl space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">{copy.finalTitle}</p>
           <p className="text-base leading-8 text-[color:var(--muted)] sm:text-lg">{copy.finalText}</p>
         </div>
-      </section>
+        </section>
+      </RevealOnScroll>
 
     </main>
   );
