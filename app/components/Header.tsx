@@ -101,31 +101,26 @@ export default function Header({ lang, searchParams }: HeaderProps) {
             <div className="ml-auto flex shrink-0 items-center gap-2 sm:hidden">
               <button
                 type="button"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:bg-[color:var(--accent-soft)]"
+                className="group inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:bg-[color:var(--accent-soft)]"
                 aria-expanded={isOpen}
                 aria-controls="mobile-navigation"
                 onClick={() => setIsOpen((current) => !current)}
               >
                 <span className="sr-only">{lang === "nl" ? `Menu ${isOpen ? "sluiten" : "openen"}` : `Menu ${isOpen ? "close" : "open"}`}</span>
-                {isOpen ? (
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 6 6 18" />
-                    <path d="m6 6 12 12" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 7h16" />
-                    <path d="M4 12h16" />
-                    <path d="M4 17h16" />
-                  </svg>
-                )}
+                <span className="relative flex h-6 w-6 items-center justify-center" aria-hidden="true">
+                  <span className={`absolute h-0.5 w-5 rounded-full bg-current transition-transform duration-300 ease-in-out ${isOpen ? "rotate-45" : "-translate-y-2"}`} />
+                  <span className={`absolute h-0.5 w-5 rounded-full bg-current transition-opacity duration-200 ease-in-out ${isOpen ? "opacity-0" : "opacity-100"}`} />
+                  <span className={`absolute h-0.5 w-5 rounded-full bg-current transition-transform duration-300 ease-in-out ${isOpen ? "-rotate-45" : "translate-y-2"}`} />
+                </span>
               </button>
             </div>
           </div>
 
           <nav
             id="mobile-navigation"
-            className={`mt-4 flex flex-col gap-2 text-sm sm:hidden ${isOpen ? "block" : "hidden"}`}
+            aria-hidden={!isOpen}
+            inert={!isOpen}
+            className={`mt-4 flex flex-col gap-2 overflow-hidden text-sm transition-[max-height,opacity,transform] duration-300 ease-in-out sm:hidden ${isOpen ? "max-h-[32rem] opacity-100" : "pointer-events-none max-h-0 -translate-y-2 opacity-0"}`}
           >
             <label className="relative mb-2 block">
               <span className="sr-only">{lang === "nl" ? "Selecteer taal" : "Select language"}</span>
