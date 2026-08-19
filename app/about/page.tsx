@@ -3,6 +3,7 @@ import Image from "next/image";
 
 import { resolveLang } from "../lib/i18n";
 import { defaultKeywords, siteName, socialImage } from "../seo";
+import RevealOnScroll from "../components/RevealOnScroll";
 
 const aboutCopy = {
   nl: {
@@ -199,15 +200,16 @@ export default async function AboutPage({ searchParams }: { searchParams?: Promi
           {copy.team.map((member) => (
             <article key={member.name} className="panel space-y-3 p-5">
               <div className="flex items-center gap-4">
-                <div className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-[color:var(--accent)]/55 bg-[color:var(--accent-soft)] ring-2 ring-[color:var(--border)]">
+                <RevealOnScroll className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-[color:var(--accent)]/55 bg-[color:var(--accent-soft)] ring-2 ring-[color:var(--border)]">
                   <Image
                     src={member.image}
                     alt={member.imageAlt}
                     fill
                     sizes="64px"
+                    loading="lazy"
                     className="object-cover"
                   />
-                </div>
+                </RevealOnScroll>
                 <p className="text-xl font-semibold text-[color:var(--foreground)]">{member.name}</p>
               </div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--accent)]">{member.role}</p>

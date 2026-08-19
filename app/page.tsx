@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { buildLocalizedHref, resolveLang } from "./lib/i18n";
 import { defaultKeywords, siteDescription, siteName, socialImage } from "./seo";
+import RevealOnScroll from "./components/RevealOnScroll";
 
 export const metadata: Metadata = {
   title: siteName,
@@ -135,17 +136,18 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       </section>
 
       <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
-        <div className="relative max-h-[320px] overflow-hidden rounded-md">
+        <RevealOnScroll className="relative max-h-[320px] overflow-hidden rounded-md">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[0].image}
               alt={copy.sections[0].imageAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="lazy"
               className="object-cover"
             />
           </div>
-        </div>
+        </RevealOnScroll>
 
         <div className="space-y-5">
           <p className="eyebrow">{copy.sections[0].eyebrow}</p>
@@ -169,31 +171,33 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           </p>
         </div>
 
-        <div className="relative max-h-[320px] overflow-hidden rounded-md">
+        <RevealOnScroll className="relative max-h-[320px] overflow-hidden rounded-md">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[1].image}
               alt={copy.sections[1].imageAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="lazy"
               className="object-cover"
             />
           </div>
-        </div>
+        </RevealOnScroll>
       </section>
 
       <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
-        <div className="relative max-h-[320px] overflow-hidden rounded-md">
+        <RevealOnScroll className="relative max-h-[320px] overflow-hidden rounded-md">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md">
             <Image
               src={copy.sections[2].image}
               alt={copy.sections[2].imageAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="lazy"
               className="object-cover"
             />
           </div>
-        </div>
+        </RevealOnScroll>
 
         <div className="space-y-5">
           <p className="eyebrow">{copy.sections[2].eyebrow}</p>
