@@ -78,8 +78,8 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
                   onClick={() => setSelectedProfileId(profile.id)}
                   className={`rounded-[1.5rem] border p-5 text-left transition ${
                     isSelected
-                      ? "border-[color:var(--accent)] bg-[color:var(--surface)] shadow-[0_18px_40px_rgba(36,25,19,0.08)]"
-                      : "border-[color:var(--border)] bg-[color:rgba(255,248,240,0.78)] hover:border-[color:var(--accent)]/50"
+                      ? "border-[color:var(--accent)] bg-[color:var(--surface)] shadow-[0_18px_40px_rgba(47,41,36,0.08)]"
+                      : "border-[color:var(--border)] bg-[color:rgba(255,253,250,0.78)] hover:border-[color:var(--accent)]/50"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -175,7 +175,7 @@ export default function PricingSimulator({ lang = "nl" }: PricingSimulatorProps)
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:rgba(255,248,240,0.72)] p-5 text-sm leading-7 text-[color:var(--muted)]">
+          <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:rgba(255,253,250,0.72)] p-5 text-sm leading-7 text-[color:var(--muted)]">
             <p>{lang === "nl" ? `Laatst bijgewerkt: ${new Date(pricingData.fetchedAt).toLocaleString("nl-BE")}` : `Last updated: ${new Date(pricingData.fetchedAt).toLocaleString("en-GB")}`}</p>
             <p className="mt-3">{lang === "nl" ? "Bij een aanvraag valideren we je configuratie opnieuw en sturen we een finale offerte op maat." : "When you request a quote, we validate your configuration again and send a final tailored quote."}</p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">

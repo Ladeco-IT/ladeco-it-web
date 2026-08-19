@@ -30,7 +30,17 @@ export default function Header({ lang, searchParams }: HeaderProps) {
   }
 
   return (
-    <div className="w-full border-b border-[color:var(--border)]/70 bg-[color:var(--surface)]/95 shadow-[0_10px_30px_rgba(36,25,19,0.04)] backdrop-blur">
+    <div
+      className="header-shell w-full border-b border-[color:var(--border)]/70 bg-[color:var(--surface)]/95 shadow-[0_10px_30px_rgba(36,25,19,0.04)] backdrop-blur"
+      style={{
+        "--surface": "#fcf8f2",
+        "--foreground": "#241913",
+        "--muted": "#6f5b4e",
+        "--border": "#d7c1a8",
+        "--accent": "#9a5b2f",
+        "--accent-soft": "#f4e3d0",
+      } as React.CSSProperties}
+    >
       <div className="px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5">
         <header className="w-full rounded-none border-0 bg-transparent px-0 py-0">
           <div className="relative flex items-center gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
