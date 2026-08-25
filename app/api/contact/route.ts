@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
   const pcComponentsLabel = String(formData.get("pcComponentsLabel") || "").trim();
   const pcApproval = String(formData.get("pcApproval") || "").trim();
   const pcOrderIntent = String(formData.get("pcOrderIntent") || "").trim();
-  const isPcLead = Boolean(pcLabel);
+  const pcMode = String(formData.get("pcMode") || "").trim();
+  const isPcLead = Boolean(pcLabel || pcMode === "simple");
   const isOrderIntent = pcOrderIntent === "1";
   const approvalTag = pcApproval === "1" ? "AKKOORD" : "NOG TE BESPREKEN";
   const orderTag = isOrderIntent ? "BETAALLINK GEWENST" : "OFFERTETRAJECT";
@@ -53,7 +54,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const from = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
-    const to = process.env.RESEND_TO_EMAIL ? [process.env.RESEND_TO_EMAIL] : ["alessio@ladeco-it.com"];
+    const to = isPcLead
+      ? ["alessio@ladeco-it.com", "thibaut@ladeco-it.com"]
+      : ["alessio@ladeco-it.com"];
     const { data, error } = await resend.emails.send({
       from: `Ladeco IT <${from}>`,
       to,
