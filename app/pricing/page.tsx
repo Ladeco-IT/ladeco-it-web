@@ -1,5 +1,5 @@
-import ServicePricing from "../components/ServicePricing";
-import { resolveLang } from "../lib/i18n";
+import ServicePricing from "@/components/ServicePricing";
+import { resolveLang } from "@/lib/i18n";
 
 export default async function PricingPage({ searchParams }: { searchParams?: Promise<{ lang?: string }> }) {
     const resolvedSearchParams = await searchParams;

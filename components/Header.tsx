@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { buildLocalizedHref, resolveLang, type Lang } from "../lib/i18n";
+import { buildLocalizedHref, resolveLang , type Lang } from "@/lib/i18n";
 
 type HeaderProps = {
   lang: Lang;

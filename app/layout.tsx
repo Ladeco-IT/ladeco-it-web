@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
-import AppShell from "./components/AppShell";
-import { defaultKeywords, siteDescription, siteName, siteUrl, socialImage } from "./seo";
+import AppShell from "@/components/AppShell";
+import { defaultKeywords, siteDescription, siteName, siteUrl, socialImage } from "@/lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -1,8 +1,8 @@
 import Image from "next/image";
 import type { Metadata } from "next";
-import { buildLocalizedHref, resolveLang } from "./lib/i18n";
-import { defaultKeywords, siteDescription, siteName, socialImage } from "./seo";
-import RevealOnScroll from "./components/RevealOnScroll";
+import { buildLocalizedHref, resolveLang } from "@/lib/i18n";
+import { defaultKeywords, siteDescription, siteName, socialImage } from "@/lib/seo";
+import RevealOnScroll from "@/components/RevealOnScroll";
 
 export const metadata: Metadata = {
   title: siteName,

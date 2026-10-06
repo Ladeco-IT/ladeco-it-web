@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import ContactForm from "../components/ContactForm";
-import { resolveLang } from "../lib/i18n";
-import { defaultKeywords, siteName, socialImage } from "../seo";
+import ContactForm from "@/components/ContactForm";
+import { resolveLang } from "@/lib/i18n";
+import { defaultKeywords, siteName, socialImage } from "@/lib/seo";
 
 const contactCopy = {
   nl: {
