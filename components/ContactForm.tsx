@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { buildLocalizedHref, type Lang } from "../lib/i18n";
+import { buildLocalizedHref, type Lang } from "@/lib/i18n";
 
 type ContactFormProps = {
   lang: Lang;

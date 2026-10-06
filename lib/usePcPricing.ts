@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import {
   PcPricingPayload,
   createFallbackPcPricingPayload,
-} from "@/app/lib/pcBuilderCatalog";
-import { type Lang } from "../lib/i18n";
+} from "@/lib/pcBuilderCatalog";
+import { type Lang } from "@/lib/i18n";
 
 const fallbackPcPricing = createFallbackPcPricingPayload();
 

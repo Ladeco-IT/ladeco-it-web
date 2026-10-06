@@ -1,5 +1,5 @@
-import { serviceRates } from "@/app/lib/pcBuilderCatalog";
-import { type Lang } from "../lib/i18n";
+import { serviceRates } from "@/lib/pcBuilderCatalog";
+import { type Lang } from "@/lib/i18n";
 
 const euro = new Intl.NumberFormat("nl-BE", {
   style: "currency",

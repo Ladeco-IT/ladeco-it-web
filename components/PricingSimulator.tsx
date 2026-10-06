@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { usePcPricing } from "./usePcPricing";
-import { buildLocalizedHref, type Lang } from "../lib/i18n";
+import { usePcPricing } from "@/lib/usePcPricing";
+import { buildLocalizedHref, type Lang } from "@/lib/i18n";
 
 const euro = new Intl.NumberFormat("nl-BE", {
   style: "currency",

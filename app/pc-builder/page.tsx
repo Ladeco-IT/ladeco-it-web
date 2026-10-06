@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import PcBuilderExperience from "../components/PcBuilderExperience";
-import { resolveLang } from "../lib/i18n";
-import { defaultKeywords, siteName, socialImage } from "../seo";
+import PcBuilderExperience from "@/components/PcBuilderExperience";
+import { resolveLang } from "@/lib/i18n";
+import { defaultKeywords, siteName, socialImage } from "@/lib/seo";
 
 const pcBuilderCopy = {
   nl: {

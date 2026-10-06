@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 
-import { resolveLang } from "../lib/i18n";
-import { defaultKeywords, siteName, socialImage } from "../seo";
-import RevealOnScroll from "../components/RevealOnScroll";
+import { resolveLang } from "@/lib/i18n";
+import { defaultKeywords, siteName, socialImage } from "@/lib/seo";
+import RevealOnScroll from "@/components/RevealOnScroll";
 
 const aboutCopy = {
   nl: {

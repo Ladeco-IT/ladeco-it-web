@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Footer from "./Footer";
 import Header from "./Header";
-import { resolveLang } from "../lib/i18n";
+import { resolveLang } from "@/lib/i18n";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();

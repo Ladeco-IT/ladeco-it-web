@@ -5,7 +5,7 @@ import {
   PcPriceSnapshot,
   createPcPricingPayload,
   pcPriceSources,
-} from "@/app/lib/pcBuilderCatalog";
+} from "@/lib/pcBuilderCatalog";
 
 export const runtime = "nodejs";
 
